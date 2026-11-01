@@ -61,6 +61,11 @@
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         <span id="ffmpeg-label">FFMPEG CONNECTED</span>
       </div>
+      <div class="h-4 w-[1px] bg-zinc-800"></div>
+      <div id="encoder-status" class="flex items-center space-x-1.5 text-[11px] font-mono text-zinc-400">
+        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+        <span id="encoder-label">HARDWARE ACCEL</span>
+      </div>
     </div>
 
     <div class="flex items-center space-x-4">
@@ -431,8 +436,12 @@
           document.getElementById('ffmpeg-label').innerText = 'FFMPEG NOT FOUND';
           document.getElementById('ffmpeg-label').previousElementSibling.className = 'w-2 h-2 rounded-full bg-rose-500';
         }
+        if (data.encoder_name) {
+          document.getElementById('encoder-label').innerText = data.encoder_name;
+        }
         document.getElementById('capcut-draft-dir').value = data.capcut_draft_dir;
         logConsole('System initialized. Drafts path: ' + data.capcut_draft_dir);
+        logConsole('Video acceleration: ' + (data.encoder_name || 'libx264'));
       })
       .catch(err => logConsole('System probe error: ' + err));
 
@@ -625,7 +634,7 @@
       const gap = parseFloat(document.getElementById('param-gap').value);
       const pad = parseFloat(document.getElementById('param-pad').value);
 
-      showSpinner('Analyzing silence and building timeline trim filters...');
+      showSpinner('Cutting silence with GPU hardware acceleration...');
       logConsole(`Starting Silence Removal (Threshold: ${db}dB, Min Gap: ${gap}s, Padding: ${pad}s)`);
 
       fetch('/api/process/silence', {

@@ -29,6 +29,7 @@ from mcp_video_studio.tools.ffmpeg_ops import (
     apply_lut_grade,
     extract_audio_and_metadata,
     get_binary_path,
+    get_video_encoder_info,
     remove_silence,
     run_command,
     smart_crop_vertical,
@@ -112,17 +113,20 @@ def serve_index() -> HTMLResponse:
 def get_system_status() -> dict[str, Any]:
     ffmpeg_ok = False
     ffmpeg_ver = "Not detected"
+    enc_name = "Detecting..."
     try:
         bin_p = get_binary_path("ffmpeg")
         ffmpeg_ok = True
-        res = run_command([bin_p, "-version"])
+        res = run_command([bin_p, "-version"], timeout=10)
         ffmpeg_ver = res.stdout.splitlines()[0]
+        enc_name, _ = get_video_encoder_info()
     except Exception as exc:
         ffmpeg_ver = str(exc)
 
     return {
         "ffmpeg_available": ffmpeg_ok,
         "ffmpeg_version": ffmpeg_ver,
+        "encoder_name": enc_name,
         "capcut_draft_dir": str(get_capcut_draft_dir()),
         "workspace_dir": str(STUDIO_DIR),
     }

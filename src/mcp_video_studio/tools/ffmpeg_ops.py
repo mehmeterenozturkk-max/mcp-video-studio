@@ -47,7 +47,77 @@ def escape_filter_path(file_path: str | Path) -> str:
     return escaped
 
 
-def run_command(cmd: list[str], timeout: int | None = 600) -> subprocess.CompletedProcess[str]:
+_CACHED_ENCODER_ARGS: list[str] | None = None
+_CACHED_ENCODER_NAME: str | None = None
+
+
+def get_video_encoder_info() -> tuple[str, list[str]]:
+    """Auto-detect the fastest available hardware or software video encoder.
+
+    Evaluates NVIDIA NVENC, Intel QSV, and falls back to optimized CPU libx264.
+    Enforces '-pix_fmt yuv420p' to guarantee web browser compatibility and prevent
+    slow 10-bit software fallbacks on HDR / smartphone inputs.
+    """
+    global _CACHED_ENCODER_ARGS, _CACHED_ENCODER_NAME
+    if _CACHED_ENCODER_ARGS is not None and _CACHED_ENCODER_NAME is not None:
+        return _CACHED_ENCODER_NAME, _CACHED_ENCODER_ARGS
+
+    ffmpeg_bin = get_binary_path("ffmpeg")
+
+    # 1. Test NVIDIA NVENC
+    try:
+        test_cmd = [
+            ffmpeg_bin,
+            "-f", "lavfi",
+            "-i", "color=c=black:s=64x64:d=0.1",
+            "-c:v", "h264_nvenc",
+            "-pix_fmt", "yuv420p",
+            "-f", "null",
+            "-",
+        ]
+        res = subprocess.run(test_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+        if res.returncode == 0:
+            _CACHED_ENCODER_NAME = "NVIDIA NVENC (Hardware Accelerated)"
+            _CACHED_ENCODER_ARGS = ["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "23", "-pix_fmt", "yuv420p"]
+            logger.info("Hardware acceleration active: %s", _CACHED_ENCODER_NAME)
+            return _CACHED_ENCODER_NAME, _CACHED_ENCODER_ARGS
+    except Exception:
+        pass
+
+    # 2. Test Intel QSV
+    try:
+        test_cmd = [
+            ffmpeg_bin,
+            "-f", "lavfi",
+            "-i", "color=c=black:s=64x64:d=0.1",
+            "-c:v", "h264_qsv",
+            "-pix_fmt", "nv12",
+            "-f", "null",
+            "-",
+        ]
+        res = subprocess.run(test_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+        if res.returncode == 0:
+            _CACHED_ENCODER_NAME = "Intel QSV (Hardware Accelerated)"
+            _CACHED_ENCODER_ARGS = ["-c:v", "h264_qsv", "-preset", "veryfast", "-global_quality", "23", "-pix_fmt", "nv12"]
+            logger.info("Hardware acceleration active: %s", _CACHED_ENCODER_NAME)
+            return _CACHED_ENCODER_NAME, _CACHED_ENCODER_ARGS
+    except Exception:
+        pass
+
+    # 3. Fallback to CPU libx264 with optimized fast preset
+    _CACHED_ENCODER_NAME = "CPU libx264 (Software Optimized)"
+    _CACHED_ENCODER_ARGS = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "22", "-pix_fmt", "yuv420p"]
+    logger.info("Encoder fallback: %s", _CACHED_ENCODER_NAME)
+    return _CACHED_ENCODER_NAME, _CACHED_ENCODER_ARGS
+
+
+def get_video_encoder_args() -> list[str]:
+    """Return command list of the detected optimal video encoder arguments."""
+    _, args = get_video_encoder_info()
+    return list(args)
+
+
+def run_command(cmd: list[str], timeout: int | None = 1800) -> subprocess.CompletedProcess[str]:
     """Execute a subprocess command safely with timeout and detailed error messages."""
     logger.debug("Executing command: %s", " ".join(cmd))
     try:
@@ -315,9 +385,10 @@ def remove_silence(
 
     ffmpeg_bin = get_binary_path("ffmpeg")
 
-    # 2. Detect silence intervals
+    # 2. Detect silence intervals (use -vn so FFmpeg only reads audio without decoding video frames)
     detect_cmd = [
         ffmpeg_bin,
+        "-vn",
         "-i",
         str(input_p),
         "-af",
@@ -385,7 +456,8 @@ def remove_silence(
     ]
 
     if has_video:
-        cut_cmd.extend(["-map", "[outv]", "-map", "[outa]", "-c:v", "libx264", "-preset", "fast", "-crf", "22"])
+        cut_cmd.extend(["-map", "[outv]", "-map", "[outa]"])
+        cut_cmd.extend(get_video_encoder_args())
     else:
         cut_cmd.extend(["-map", "[outa]"])
 
@@ -447,6 +519,8 @@ def smart_crop_vertical(
     w = target_width
     h = target_height
 
+    enc_args = get_video_encoder_args()
+
     if mode == "blur_pad":
         # Background: fill 9:16, crop excess, blur. Foreground: scale to width, overlay centered.
         filter_spec = (
@@ -466,12 +540,7 @@ def smart_crop_vertical(
             "[outv]",
             "-map",
             "0:a?",
-            "-c:v",
-            "libx264",
-            "-preset",
-            "fast",
-            "-crf",
-            "22",
+            *enc_args,
             "-c:a",
             "copy",
             str(out_p),
@@ -492,12 +561,7 @@ def smart_crop_vertical(
             "0:v",
             "-map",
             "0:a?",
-            "-c:v",
-            "libx264",
-            "-preset",
-            "fast",
-            "-crf",
-            "22",
+            *enc_args,
             "-c:a",
             "copy",
             str(out_p),
@@ -519,12 +583,7 @@ def smart_crop_vertical(
             "0:v",
             "-map",
             "0:a?",
-            "-c:v",
-            "libx264",
-            "-preset",
-            "fast",
-            "-crf",
-            "22",
+            *enc_args,
             "-c:a",
             "copy",
             str(out_p),
@@ -581,6 +640,8 @@ def apply_lut_grade(
     ffmpeg_bin = get_binary_path("ffmpeg")
     escaped_lut = escape_filter_path(lut_p)
 
+    enc_args = get_video_encoder_args()
+
     if math.isclose(intensity, 1.0, rel_tol=1e-3):
         # 100% LUT application
         cmd = [
@@ -594,12 +655,7 @@ def apply_lut_grade(
             "0:v",
             "-map",
             "0:a?",
-            "-c:v",
-            "libx264",
-            "-preset",
-            "fast",
-            "-crf",
-            "20",
+            *enc_args,
             "-c:a",
             "copy",
             str(out_p),
@@ -632,12 +688,7 @@ def apply_lut_grade(
             "[outv]",
             "-map",
             "0:a?",
-            "-c:v",
-            "libx264",
-            "-preset",
-            "fast",
-            "-crf",
-            "20",
+            *enc_args,
             "-c:a",
             "copy",
             str(out_p),
