@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-video-studio"
+version = "1.0.0"
+description = "An AI Agent MCP Server for automated FFmpeg media processing, 3D LUT (.cube) color grading, silence removal, and native CapCut draft_content.json generation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Mehmet Eren Öztürk", email = "334684278+mehmeterenozturkk-max@users.noreply.github.com" },
+]
+keywords = [
+    "mcp",
+    "model-context-protocol",
+    "fastmcp",
+    "ffmpeg",
+    "capcut",
+    "video-editing",
+    "lut",
+    "color-grading",
+    "silence-removal",
+    "ai-agents",
+    "claude-desktop"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Video :: Non-Linear Editor",
+]
+dependencies = [
+    "mcp>=1.3.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.scripts]
+mcp-video-studio = "mcp_video_studio.server:main"
+
+[project.urls]
+Homepage = "https://github.com/mehmeterenozturkk-max/mcp-video-studio"
+Repository = "https://github.com/mehmeterenozturkk-max/mcp-video-studio"
+Issues = "https://github.com/mehmeterenozturkk-max/mcp-video-studio/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_video_studio"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --import-mode=importlib"
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_default_fixture_loop_scope = "function"
