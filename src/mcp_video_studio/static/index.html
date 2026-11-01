@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Video Studio // NLE Workstation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            zinc: {
+              950: '#09090b',
+              900: '#121215',
+              850: '#18181b',
+              800: '#27272a',
+              700: '#3f3f46',
+            },
+            accent: {
+              amber: '#f59e0b',
+              blue: '#3b82f6',
+              emerald: '#10b981',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    input[type=range] { accent-color: #3b82f6; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 font-sans h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- TOP APP HEADER -->
+  <header class="h-11 bg-zinc-900 border-b border-zinc-800 px-4 flex items-center justify-between flex-shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2 text-zinc-100 font-mono font-semibold text-xs tracking-wider">
+        <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <span>VIDEO STUDIO</span>
+        <span class="text-zinc-600 font-normal">v1.0.0</span>
+      </div>
+      <div class="h-4 w-[1px] bg-zinc-800"></div>
+      <div id="system-status" class="flex items-center space-x-1.5 text-[11px] font-mono text-zinc-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span id="ffmpeg-label">FFMPEG CONNECTED</span>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <div id="active-file-pill" class="text-xs font-mono text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 hidden">
+        <span class="text-zinc-500">CLIP:</span> <span id="active-file-name" class="text-zinc-200 font-medium">None</span>
+      </div>
+      <button onclick="toggleTerminal()" class="px-2.5 py-1 bg-zinc-850 hover:bg-zinc-800 border border-zinc-800 rounded text-xs font-mono text-zinc-400 hover:text-zinc-200 transition-colors flex items-center space-x-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>LOGS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN NLE WORKSPACE -->
+  <main class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT PANEL: MEDIA POOL & INSPECTOR -->
+    <section class="w-80 bg-zinc-900 border-r border-zinc-800 flex flex-col flex-shrink-0">
+      <div class="p-3 border-b border-zinc-800">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 font-semibold">Media Pool</div>
+        
+        <!-- Dropzone -->
+        <div id="dropzone" onclick="document.getElementById('file-input').click()" class="border border-dashed border-zinc-700 hover:border-zinc-500 bg-zinc-950/60 rounded p-4 text-center cursor-pointer transition-colors group">
+          <input type="file" id="file-input" class="hidden" accept="video/*" onchange="handleFileSelect(event)">
+          <svg class="w-6 h-6 mx-auto mb-1 text-zinc-500 group-hover:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <div class="text-xs text-zinc-300 font-medium">Drop video or browse</div>
+          <div class="text-[10px] text-zinc-500 mt-0.5">MP4, MOV, MKV, WebM</div>
+        </div>
+
+        <!-- Path input -->
+        <div class="mt-2 flex space-x-1">
+          <input type="text" id="manual-path-input" placeholder="Or enter local file path..." class="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1 rounded text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-600 font-mono">
+          <button onclick="loadManualPath()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-xs rounded text-zinc-300 font-mono transition-colors">Load</button>
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div class="flex-1 overflow-y-auto p-3">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 font-semibold flex items-center justify-between">
+          <span>Clip Metadata</span>
+          <span id="inspect-status" class="text-zinc-600 text-[10px]">No clip loaded</span>
+        </div>
+
+        <div id="metadata-box" class="space-y-1.5 text-xs font-mono text-zinc-300">
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Resolution</span>
+            <span id="meta-res" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Framerate</span>
+            <span id="meta-fps" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Video Codec</span>
+            <span id="meta-vcodec" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Duration</span>
+            <span id="meta-dur" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Audio Codec</span>
+            <span id="meta-acodec" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">Sample Rate</span>
+            <span id="meta-samplerate" class="text-zinc-200">-</span>
+          </div>
+          <div class="p-2 bg-zinc-950 rounded border border-zinc-800/80 flex justify-between">
+            <span class="text-zinc-500">File Size</span>
+            <span id="meta-size" class="text-zinc-200">-</span>
+          </div>
+        </div>
+
+        <!-- Tool Selection Tab Pills -->
+        <div class="mt-4 pt-3 border-t border-zinc-800">
+          <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 font-semibold">Active Pipeline</div>
+          <div class="space-y-1">
+            <button onclick="switchTool('silence')" id="btn-tab-silence" class="w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-800 text-zinc-100 border border-zinc-700">
+              <span>Silence Removal</span>
+              <span class="text-[10px] text-zinc-400">trim/atrim</span>
+            </button>
+            <button onclick="switchTool('crop')" id="btn-tab-crop" class="w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 border border-transparent">
+              <span>9:16 Vertical Reframing</span>
+              <span class="text-[10px] text-zinc-500">blur-pad</span>
+            </button>
+            <button onclick="switchTool('lut')" id="btn-tab-lut" class="w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 border border-transparent">
+              <span>3D LUT Color Grade</span>
+              <span class="text-[10px] text-zinc-500">lut3d</span>
+            </button>
+            <button onclick="switchTool('capcut')" id="btn-tab-capcut" class="w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 border border-transparent">
+              <span>CapCut Draft Exporter</span>
+              <span class="text-[10px] text-zinc-500">json schema</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: VIEWPORT & MONITOR -->
+    <section class="flex-1 bg-zinc-950 flex flex-col overflow-hidden relative">
+      <!-- Monitor Header / A-B Switcher -->
+      <div class="h-9 bg-zinc-900 border-b border-zinc-800 px-4 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-2">
+          <span class="font-mono text-zinc-400 text-[11px] font-semibold">VIEWPORT</span>
+          <span id="player-label" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300">SOURCE</span>
+        </div>
+        <div id="ab-switch" class="flex items-center space-x-1 hidden">
+          <button onclick="setPreviewStream('source')" id="btn-stream-source" class="px-2 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium">ORIGINAL</button>
+          <button onclick="setPreviewStream('render')" id="btn-stream-render" class="px-2 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200">PROCESSED</button>
+        </div>
+      </div>
+
+      <!-- Video Display Area -->
+      <div class="flex-1 flex items-center justify-center p-4 bg-zinc-950 relative overflow-hidden">
+        <video id="main-player" class="max-h-full max-w-full rounded bg-black shadow-2xl border border-zinc-850" controlslist="nodownload" preload="metadata" ontimeupdate="updateTimecode()"></video>
+        
+        <!-- Empty Placeholder -->
+        <div id="player-placeholder" class="text-center text-zinc-600">
+          <svg class="w-12 h-12 mx-auto mb-2 text-zinc-700 stroke-current stroke-1" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="2" stroke-width="2"/>
+            <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+          </svg>
+          <div class="text-xs font-mono">No video loaded in viewport</div>
+          <div class="text-[11px] text-zinc-700 mt-1">Drop a clip in the media pool to preview</div>
+        </div>
+
+        <!-- Render Spinner Overlay -->
+        <div id="render-overlay" class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 z-10 hidden">
+          <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <div class="text-xs font-mono text-zinc-300" id="render-overlay-text">Executing FFmpeg transformation...</div>
+        </div>
+      </div>
+
+      <!-- Custom NLE Transport Bar -->
+      <div class="h-12 bg-zinc-900 border-t border-zinc-800 px-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button onclick="togglePlay()" class="w-7 h-7 bg-zinc-800 hover:bg-zinc-700 rounded flex items-center justify-center text-zinc-200 transition-colors">
+            <svg id="play-icon" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+            <svg id="pause-icon" class="w-3.5 h-3.5 fill-current hidden" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          </button>
+          
+          <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="seekVideo(this.value)" class="w-48 md:w-72 h-1 bg-zinc-800 rounded appearance-none cursor-pointer">
+        </div>
+
+        <!-- Timecode Display (HH:MM:SS:FF) -->
+        <div class="flex items-center space-x-2">
+          <span class="text-[10px] font-mono text-zinc-500">TIMECODE:</span>
+          <div id="timecode-display" class="font-mono text-xs font-bold text-amber-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 tracking-wider">
+            00:00:00:00
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: TOOL PARAMETERS -->
+    <section class="w-88 bg-zinc-900 border-l border-zinc-800 flex flex-col flex-shrink-0">
+      <div class="p-3 border-b border-zinc-800 flex items-center justify-between">
+        <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">Parameters</span>
+        <span id="active-tool-title" class="text-xs font-mono text-blue-400 font-medium">Silence Removal</span>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        
+        <!-- TOOL 1: SILENCE REMOVAL -->
+        <div id="params-silence" class="space-y-4">
+          <div class="text-xs text-zinc-400 leading-relaxed">
+            Splices dead silence out of video and audio tracks with synchronized trim filters and boundary padding.
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <span class="text-zinc-400">Silence Threshold</span>
+              <span id="label-db" class="text-zinc-200">-30 dB</span>
+            </div>
+            <input type="range" id="param-db" min="-50" max="-15" value="-30" step="1" oninput="document.getElementById('label-db').innerText = this.value + ' dB'" class="w-full h-1.5 bg-zinc-800 rounded cursor-pointer">
+            <div class="flex justify-between text-[10px] text-zinc-600 font-mono mt-0.5">
+              <span>-50 dB (Quiet room)</span>
+              <span>-15 dB (Aggressive)</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <span class="text-zinc-400">Min Silence Gap</span>
+              <span id="label-gap" class="text-zinc-200">0.50 s</span>
+            </div>
+            <input type="range" id="param-gap" min="0.1" max="2.0" value="0.5" step="0.05" oninput="document.getElementById('label-gap').innerText = parseFloat(this.value).toFixed(2) + ' s'" class="w-full h-1.5 bg-zinc-800 rounded cursor-pointer">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <span class="text-zinc-400">Voice Boundary Padding</span>
+              <span id="label-pad" class="text-zinc-200">0.10 s</span>
+            </div>
+            <input type="range" id="param-pad" min="0.0" max="0.3" value="0.1" step="0.02" oninput="document.getElementById('label-pad').innerText = parseFloat(this.value).toFixed(2) + ' s'" class="w-full h-1.5 bg-zinc-800 rounded cursor-pointer">
+          </div>
+
+          <button onclick="runSilenceProcess()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-mono text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5">
+            <span>RUN SILENCE REMOVAL</span>
+          </button>
+        </div>
+
+        <!-- TOOL 2: 9:16 VERTICAL CROP -->
+        <div id="params-crop" class="space-y-4 hidden">
+          <div class="text-xs text-zinc-400 leading-relaxed">
+            Converts horizontal 16:9 widescreen video into 9:16 vertical video for Shorts, Reels, and TikTok.
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-mono text-zinc-400">Framing Method</label>
+            <div class="space-y-1.5">
+              <label class="flex items-center space-x-2 text-xs font-mono p-2 bg-zinc-950 rounded border border-zinc-800 cursor-pointer">
+                <input type="radio" name="crop_mode" value="blur_pad" checked class="text-blue-500">
+                <div>
+                  <div class="text-zinc-200 font-medium">Blur-Pad (Ambient)</div>
+                  <div class="text-[10px] text-zinc-500">Blurred background with sharp centered video</div>
+                </div>
+              </label>
+              <label class="flex items-center space-x-2 text-xs font-mono p-2 bg-zinc-950 rounded border border-zinc-800 cursor-pointer">
+                <input type="radio" name="crop_mode" value="center_crop" class="text-blue-500">
+                <div>
+                  <div class="text-zinc-200 font-medium">Center Crop</div>
+                  <div class="text-[10px] text-zinc-500">Direct 9:16 crop filling the full canvas</div>
+                </div>
+              </label>
+              <label class="flex items-center space-x-2 text-xs font-mono p-2 bg-zinc-950 rounded border border-zinc-800 cursor-pointer">
+                <input type="radio" name="crop_mode" value="fit_black_bars" class="text-blue-500">
+                <div>
+                  <div class="text-zinc-200 font-medium">Letterbox / Pillarbox</div>
+                  <div class="text-[10px] text-zinc-500">Preserve framing with black borders</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div>
+              <span class="text-zinc-500 text-[10px]">WIDTH</span>
+              <input type="text" id="crop-w" value="1080" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-zinc-200">
+            </div>
+            <div>
+              <span class="text-zinc-500 text-[10px]">HEIGHT</span>
+              <input type="text" id="crop-h" value="1920" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-zinc-200">
+            </div>
+          </div>
+
+          <button onclick="runCropProcess()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-mono text-xs font-semibold transition-colors">
+            REFRAME TO 9:16
+          </button>
+        </div>
+
+        <!-- TOOL 3: 3D LUT GRADE -->
+        <div id="params-lut" class="space-y-4 hidden">
+          <div class="text-xs text-zinc-400 leading-relaxed">
+            Applies cinema-standard 3D Look-Up Table (.cube) color grading with adjustable opacity.
+          </div>
+
+          <div>
+            <label class="text-xs font-mono text-zinc-400 block mb-1">LUT File (.cube / .3dl)</label>
+            <input type="text" id="lut-file-path" placeholder="C:/path/to/cinematic.cube" class="w-full bg-zinc-950 border border-zinc-800 px-2 py-1.5 rounded text-xs text-zinc-200 placeholder-zinc-600 font-mono">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <span class="text-zinc-400">Grading Opacity</span>
+              <span id="label-lut-intensity" class="text-zinc-200">100%</span>
+            </div>
+            <input type="range" id="param-lut-intensity" min="0" max="1" value="1" step="0.05" oninput="document.getElementById('label-lut-intensity').innerText = Math.round(this.value * 100) + '%'" class="w-full h-1.5 bg-zinc-800 rounded cursor-pointer">
+          </div>
+
+          <button onclick="runLutProcess()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-mono text-xs font-semibold transition-colors">
+            APPLY 3D LUT GRADE
+          </button>
+        </div>
+
+        <!-- TOOL 4: CAPCUT DRAFT EXPORTER -->
+        <div id="params-capcut" class="space-y-4 hidden">
+          <div class="text-xs text-zinc-400 leading-relaxed">
+            Synthesizes native CapCut Desktop draft_content.json and meta info directly in your drafts directory.
+          </div>
+
+          <div>
+            <label class="text-xs font-mono text-zinc-400 block mb-1">Project Name</label>
+            <input type="text" id="capcut-proj-name" value="Studio_Project_01" class="w-full bg-zinc-950 border border-zinc-800 px-2 py-1.5 rounded text-xs text-zinc-200 font-mono">
+          </div>
+
+          <div>
+            <label class="text-xs font-mono text-zinc-400 block mb-1">CapCut Drafts Folder</label>
+            <input type="text" id="capcut-draft-dir" class="w-full bg-zinc-950 border border-zinc-800 px-2 py-1.5 rounded text-xs text-zinc-200 font-mono">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div>
+              <span class="text-zinc-500 text-[10px]">SPEED MULTIPLIER</span>
+              <input type="number" id="capcut-speed" value="1.0" step="0.1" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-zinc-200">
+            </div>
+            <div>
+              <span class="text-zinc-500 text-[10px]">FPS</span>
+              <input type="number" id="capcut-fps" value="30.0" step="1" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-zinc-200">
+            </div>
+          </div>
+
+          <button onclick="runCapCutProcess()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-mono text-xs font-semibold transition-colors">
+            GENERATE CAPCUT DRAFT
+          </button>
+        </div>
+
+        <!-- Execution Results Card -->
+        <div id="result-box" class="p-3 bg-zinc-950 rounded border border-zinc-800 text-xs font-mono space-y-1.5 hidden">
+          <div class="text-emerald-400 font-semibold text-[11px] uppercase tracking-wider flex items-center space-x-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Process Complete</span>
+          </div>
+          <div id="result-details" class="text-zinc-400 text-[11px] leading-relaxed break-all"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM PANEL: COLLAPSIBLE TERMINAL LOGS -->
+  <section id="terminal-panel" class="h-44 bg-zinc-950 border-t border-zinc-800 flex flex-col flex-shrink-0 transition-all">
+    <div class="h-7 bg-zinc-900 border-b border-zinc-850 px-4 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+      <div class="flex items-center space-x-2">
+        <span class="text-zinc-500">FFMPEG CONSOLE</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="clearLogs()" class="hover:text-zinc-200 transition-colors">CLEAR</button>
+        <button onclick="toggleTerminal()" class="hover:text-zinc-200 transition-colors">CLOSE</button>
+      </div>
+    </div>
+    <div id="console-output" class="flex-1 p-3 font-mono text-xs text-zinc-300 overflow-y-auto space-y-1">
+      <div class="text-zinc-600">// Video Studio NLE Engine initialized. Ready for operations.</div>
+    </div>
+  </section>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    let activeFilePath = null;
+    let renderedFilePath = null;
+    let activeMeta = null;
+    let activeTool = 'silence';
+
+    const player = document.getElementById('main-player');
+    const timecodeDisplay = document.getElementById('timecode-display');
+
+    // Init system status
+    fetch('/api/system')
+      .then(res => res.json())
+      .then(data => {
+        if (data.ffmpeg_available) {
+          document.getElementById('ffmpeg-label').innerText = data.ffmpeg_version.split(' ')[2] || 'FFMPEG READY';
+        } else {
+          document.getElementById('ffmpeg-label').innerText = 'FFMPEG NOT FOUND';
+          document.getElementById('ffmpeg-label').previousElementSibling.className = 'w-2 h-2 rounded-full bg-rose-500';
+        }
+        document.getElementById('capcut-draft-dir').value = data.capcut_draft_dir;
+        logConsole('System initialized. Drafts path: ' + data.capcut_draft_dir);
+      })
+      .catch(err => logConsole('System probe error: ' + err));
+
+    function logConsole(msg) {
+      const consoleBox = document.getElementById('console-output');
+      const time = new Date().toTimeString().split(' ')[0];
+      const line = document.createElement('div');
+      line.className = 'text-[11px] text-zinc-300';
+      line.innerHTML = `<span class="text-zinc-600">[${time}]</span> ${msg}`;
+      consoleBox.appendChild(line);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById('console-output').innerHTML = '<div class="text-zinc-600">// Console cleared.</div>';
+    }
+
+    function toggleTerminal() {
+      const term = document.getElementById('terminal-panel');
+      term.classList.toggle('hidden');
+    }
+
+    function switchTool(tool) {
+      activeTool = tool;
+      const tools = ['silence', 'crop', 'lut', 'capcut'];
+      const titles = {
+        'silence': 'Silence Removal',
+        'crop': '9:16 Vertical Reframing',
+        'lut': '3D LUT Color Grade',
+        'capcut': 'CapCut Draft Exporter'
+      };
+
+      document.getElementById('active-tool-title').innerText = titles[tool];
+
+      tools.forEach(t => {
+        const btn = document.getElementById(`btn-tab-${t}`);
+        const pane = document.getElementById(`params-${t}`);
+        if (t === tool) {
+          btn.className = 'w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-800 text-zinc-100 border border-zinc-700';
+          pane.classList.remove('hidden');
+        } else {
+          btn.className = 'w-full text-left px-2.5 py-1.5 rounded text-xs font-mono transition-colors flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 border border-transparent';
+          pane.classList.add('hidden');
+        }
+      });
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      logConsole(`Uploading ${file.name} to studio workspace...`);
+      showSpinner('Uploading and probing media stream...');
+
+      fetch('/api/upload', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          hideSpinner();
+          if (data.success) {
+            setLoadedClip(data.file_path, data.media_url, data.metadata);
+            logConsole(`Uploaded successfully. Resolution: ${data.metadata.video?.width}x${data.metadata.video?.height}, FPS: ${data.metadata.video?.fps}`);
+          } else {
+            alert('Error loading file: ' + data.detail);
+          }
+        })
+        .catch(err => {
+          hideSpinner();
+          logConsole('Upload failed: ' + err);
+        });
+    }
+
+    function loadManualPath() {
+      const path = document.getElementById('manual-path-input').value.trim();
+      if (!path) return;
+
+      showSpinner('Probing local file...');
+      logConsole(`Probing file on disk: ${path}`);
+
+      fetch('/api/probe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_path: path })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideSpinner();
+        if (data.success) {
+          setLoadedClip(data.metadata.file_path, `/media/raw?path=${encodeURIComponent(data.metadata.file_path)}`, data.metadata);
+          logConsole(`Loaded clip from disk: ${data.metadata.file_name}`);
+        } else {
+          alert('Could not probe file: ' + (data.detail || 'Unknown error'));
+        }
+      })
+      .catch(err => {
+        hideSpinner();
+        alert('File probe error: ' + err);
+      });
+    }
+
+    function setLoadedClip(filePath, mediaUrl, meta) {
+      activeFilePath = filePath;
+      activeMeta = meta;
+
+      document.getElementById('active-file-pill').classList.remove('hidden');
+      document.getElementById('active-file-name').innerText = meta.file_name;
+      document.getElementById('inspect-status').innerText = 'PROBED';
+      document.getElementById('inspect-status').className = 'text-emerald-400 text-[10px] font-bold';
+
+      // Fill metadata
+      document.getElementById('meta-res').innerText = meta.video ? `${meta.video.width}x${meta.video.height} (${meta.video.aspect_ratio})` : 'N/A';
+      document.getElementById('meta-fps').innerText = meta.video ? `${meta.video.fps} fps` : 'N/A';
+      document.getElementById('meta-vcodec').innerText = meta.video ? meta.video.codec : 'N/A';
+      document.getElementById('meta-dur').innerText = meta.duration_sec ? `${meta.duration_sec.toFixed(2)}s` : 'N/A';
+      document.getElementById('meta-acodec').innerText = meta.audio ? meta.audio.codec : 'N/A';
+      document.getElementById('meta-samplerate').innerText = meta.audio ? `${meta.audio.sample_rate} Hz` : 'N/A';
+      document.getElementById('meta-size').innerText = `${meta.file_size_mb} MB`;
+
+      // Set player
+      document.getElementById('player-placeholder').classList.add('hidden');
+      player.src = mediaUrl;
+      player.load();
+    }
+
+    function showSpinner(text) {
+      document.getElementById('render-overlay-text').innerText = text;
+      document.getElementById('render-overlay').classList.remove('hidden');
+    }
+
+    function hideSpinner() {
+      document.getElementById('render-overlay').classList.add('hidden');
+    }
+
+    // Video Transport Controls
+    function togglePlay() {
+      if (player.paused) {
+        player.play();
+        document.getElementById('play-icon').classList.add('hidden');
+        document.getElementById('pause-icon').classList.remove('hidden');
+      } else {
+        player.pause();
+        document.getElementById('play-icon').classList.remove('hidden');
+        document.getElementById('pause-icon').classList.add('hidden');
+      }
+    }
+
+    function seekVideo(val) {
+      if (player.duration) {
+        player.currentTime = (val / 100) * player.duration;
+      }
+    }
+
+    function updateTimecode() {
+      if (!player.duration) return;
+      document.getElementById('seek-bar').value = (player.currentTime / player.duration) * 100;
+
+      const fps = (activeMeta && activeMeta.video && activeMeta.video.fps) ? activeMeta.video.fps : 30;
+      const totalSec = player.currentTime;
+      const hrs = Math.floor(totalSec / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = Math.floor(totalSec % 60);
+      const frames = Math.floor((totalSec - Math.floor(totalSec)) * fps);
+
+      const pad = (n) => String(n).padStart(2, '0');
+      timecodeDisplay.innerText = `${pad(hrs)}:${pad(mins)}:${pad(secs)}:${pad(frames)}`;
+    }
+
+    function setPreviewStream(mode) {
+      if (mode === 'source') {
+        player.src = `/media/raw?path=${encodeURIComponent(activeFilePath)}`;
+        document.getElementById('btn-stream-source').className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium';
+        document.getElementById('btn-stream-render').className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200';
+        document.getElementById('player-label').innerText = 'SOURCE';
+      } else {
+        player.src = `/media/raw?path=${encodeURIComponent(renderedFilePath)}`;
+        document.getElementById('btn-stream-source').className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200';
+        document.getElementById('btn-stream-render').className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium';
+        document.getElementById('player-label').innerText = 'PROCESSED';
+      }
+      player.play();
+    }
+
+    // Pipeline executions
+    function runSilenceProcess() {
+      if (!activeFilePath) return alert('Please load a video clip first.');
+
+      const db = parseFloat(document.getElementById('param-db').value);
+      const gap = parseFloat(document.getElementById('param-gap').value);
+      const pad = parseFloat(document.getElementById('param-pad').value);
+
+      showSpinner('Analyzing silence and building timeline trim filters...');
+      logConsole(`Starting Silence Removal (Threshold: ${db}dB, Min Gap: ${gap}s, Padding: ${pad}s)`);
+
+      fetch('/api/process/silence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input_path: activeFilePath,
+          db_threshold: db,
+          min_silence_duration: gap,
+          padding: pad
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideSpinner();
+        if (data.success) {
+          renderedFilePath = data.output_path;
+          document.getElementById('ab-switch').classList.remove('hidden');
+          setPreviewStream('render');
+
+          document.getElementById('result-box').classList.remove('hidden');
+          document.getElementById('result-details').innerHTML = `
+            Output: <span class="text-zinc-200">${data.output_path}</span><br>
+            Cuts Made: <span class="text-emerald-400 font-bold">${data.cuts_made}</span> | Saved: <span class="text-emerald-400 font-bold">${data.silence_removed_sec}s (${data.reduction_percentage}%)</span><br>
+            Duration: ${data.original_duration_sec}s -> ${data.new_duration_sec}s (Elapsed: ${data.elapsed_sec}s)
+          `;
+          logConsole(`Silence removed. Cut ${data.cuts_made} dead segments. Duration reduced by ${data.reduction_percentage}%.`);
+        } else {
+          alert('Error: ' + data.detail);
+        }
+      })
+      .catch(err => {
+        hideSpinner();
+        alert('Silence removal failed: ' + err);
+      });
+    }
+
+    function runCropProcess() {
+      if (!activeFilePath) return alert('Please load a video clip first.');
+
+      const mode = document.querySelector('input[name="crop_mode"]:checked').value;
+      const w = parseInt(document.getElementById('crop-w').value);
+      const h = parseInt(document.getElementById('crop-h').value);
+
+      showSpinner(`Re-framing to 9:16 vertical (${mode})...`);
+      logConsole(`Executing 9:16 vertical crop (Mode: ${mode}, Size: ${w}x${h})`);
+
+      fetch('/api/process/crop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input_path: activeFilePath,
+          mode: mode,
+          target_width: w,
+          target_height: h
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideSpinner();
+        if (data.success) {
+          renderedFilePath = data.output_path;
+          document.getElementById('ab-switch').classList.remove('hidden');
+          setPreviewStream('render');
+
+          document.getElementById('result-box').classList.remove('hidden');
+          document.getElementById('result-details').innerHTML = `
+            Output: <span class="text-zinc-200">${data.output_path}</span><br>
+            Mode: ${data.mode} | Target: ${data.target_resolution} (Elapsed: ${data.elapsed_sec}s)
+          `;
+          logConsole(`Vertical crop completed successfully. Exported to ${data.output_path}`);
+        } else {
+          alert('Error: ' + data.detail);
+        }
+      })
+      .catch(err => {
+        hideSpinner();
+        alert('Crop process failed: ' + err);
+      });
+    }
+
+    function runLutProcess() {
+      if (!activeFilePath) return alert('Please load a video clip first.');
+      const lutPath = document.getElementById('lut-file-path').value.trim();
+      if (!lutPath) return alert('Please provide a path to a .cube or .3dl LUT file.');
+
+      const intensity = parseFloat(document.getElementById('param-lut-intensity').value);
+
+      showSpinner('Applying 3D LUT color grade...');
+      logConsole(`Applying 3D LUT (File: ${lutPath}, Intensity: ${intensity})`);
+
+      fetch('/api/process/lut', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input_path: activeFilePath,
+          lut_path: lutPath,
+          intensity: intensity
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideSpinner();
+        if (data.success) {
+          renderedFilePath = data.output_path;
+          document.getElementById('ab-switch').classList.remove('hidden');
+          setPreviewStream('render');
+
+          document.getElementById('result-box').classList.remove('hidden');
+          document.getElementById('result-details').innerHTML = `
+            Output: <span class="text-zinc-200">${data.output_path}</span><br>
+            LUT: ${data.lut_path} | Opacity: ${Math.round(data.intensity * 100)}%
+          `;
+          logConsole(`3D LUT grade applied. Exported to ${data.output_path}`);
+        } else {
+          alert('Error: ' + data.detail);
+        }
+      })
+      .catch(err => {
+        hideSpinner();
+        alert('LUT process failed: ' + err);
+      });
+    }
+
+    function runCapCutProcess() {
+      if (!activeFilePath) return alert('Please load a video clip first.');
+
+      const projName = document.getElementById('capcut-proj-name').value.trim() || 'Studio_Project';
+      const draftDir = document.getElementById('capcut-draft-dir').value.trim() || null;
+      const speed = parseFloat(document.getElementById('capcut-speed').value) || 1.0;
+      const fps = parseFloat(document.getElementById('capcut-fps').value) || 30.0;
+
+      showSpinner('Synthesizing CapCut draft schema...');
+      logConsole(`Generating native CapCut draft: ${projName}`);
+
+      fetch('/api/process/capcut', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_name: projName,
+          output_dir: draftDir,
+          fps: fps,
+          clips: [{
+            path: activeFilePath,
+            speed: speed,
+            volume: 1.0
+          }]
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideSpinner();
+        if (data.success) {
+          document.getElementById('result-box').classList.remove('hidden');
+          document.getElementById('result-details').innerHTML = `
+            Draft Project: <span class="text-zinc-200 font-bold">${data.project_name}</span><br>
+            Folder: <span class="text-zinc-300">${data.project_folder}</span><br>
+            <span class="text-blue-400 font-semibold">${data.how_to_open}</span>
+          `;
+          logConsole(`CapCut draft synthesized at: ${data.project_folder}`);
+        } else {
+          alert('Error: ' + data.detail);
+        }
+      })
+      .catch(err => {
+        hideSpinner();
+        alert('CapCut export failed: ' + err);
+      });
+    }
+  </script>
+</body>
+</html>

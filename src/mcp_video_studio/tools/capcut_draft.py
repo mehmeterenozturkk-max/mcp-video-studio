@@ -1,7 +1,7 @@
-"""Native CapCut Desktop Draft Generator for mcp-video-studio.
+"""CapCut Desktop and Jianying Pro draft generator.
 
-Generates complete, production-ready CapCut Desktop project draft folders
-containing valid `draft_content.json` and `draft_meta_info.json` files.
+Synthesizes draft_content.json and draft_meta_info.json project folders
+with microsecond timestamps directly openable in the editor.
 """
 
 from __future__ import annotations

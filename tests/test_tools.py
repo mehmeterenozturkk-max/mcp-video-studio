@@ -335,3 +335,27 @@ def test_real_remove_silence(synthetic_video: Path, tmp_path: Path):
     assert out_cut.exists()
     assert out_cut.stat().st_size > 0
 
+
+def test_studio_ui_endpoints(synthetic_video: Path):
+    """Verify FastAPI studio UI endpoints."""
+    from fastapi.testclient import TestClient
+    from mcp_video_studio.studio_ui import app
+
+    client = TestClient(app)
+
+    # Test index serves HTML
+    index_res = client.get("/")
+    assert index_res.status_code == 200
+    assert "VIDEO STUDIO" in index_res.text
+
+    # Test system endpoint
+    sys_res = client.get("/api/system")
+    assert sys_res.status_code == 200
+    assert sys_res.json()["ffmpeg_available"] is True
+
+    # Test probe endpoint
+    probe_res = client.post("/api/probe", json={"file_path": str(synthetic_video)})
+    assert probe_res.status_code == 200
+    assert probe_res.json()["metadata"]["video"]["width"] == 640
+
+

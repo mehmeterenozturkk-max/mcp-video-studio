@@ -1,8 +1,4 @@
-"""FFmpeg Media Processing Operations for mcp-video-studio.
-
-Implements high-performance video transformation pipelines including silence removal,
-smart 9:16 vertical re-framing, 3D LUT color grading, and comprehensive metadata extraction.
-"""
+"""FFmpeg operations for video reframing, silence removal, LUT grading, and probe analysis."""
 
 from __future__ import annotations
 

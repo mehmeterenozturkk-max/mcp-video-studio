@@ -1,8 +1,4 @@
-"""FastMCP Server for mcp-video-studio.
-
-Exposes native tools and resources for automated FFmpeg media operations,
-3D LUT color grading, silence removal, and native CapCut desktop draft creation.
-"""
+"""MCP server implementation for FFmpeg and CapCut draft operations."""
 
 from __future__ import annotations
 
@@ -38,11 +34,9 @@ logger = logging.getLogger("mcp_video_studio")
 server = FastMCP(
     name="mcp-video-studio",
     instructions=(
-        "mcp-video-studio is an industrial-grade Model Context Protocol server "
-        "designed for automated video editing workflows. It provides tools for "
-        "A/V synchronized silence removal, 16:9 to 9:16 smart vertical framing, "
-        "3D LUT (.cube) cinematic color grading, comprehensive ffprobe media analysis, "
-        "and direct generation of native CapCut Desktop drafts."
+        "Local MCP server providing FFmpeg video operations (silence cutting, "
+        "vertical 9:16 reframing, 3D LUT grading, stream inspection) and "
+        "native CapCut Desktop draft_content.json project synthesis."
     ),
 )
 
