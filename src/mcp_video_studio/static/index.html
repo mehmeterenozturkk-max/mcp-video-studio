@@ -1,404 +1,519 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="tr" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCP Video Studio // NLE Workstation</title>
+  <title>MCP Video Studio // Cyber NLE Workstation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            zinc: {
-              950: '#09090b',
-              925: '#0f0f12',
-              900: '#141417',
-              850: '#1a1a1f',
-              800: '#26262c',
-              750: '#32323a',
-              700: '#3f3f48',
-              600: '#52525c',
+            obsidian: {
+              950: '#030305',
+              900: '#07070a',
+              850: '#0c0d12',
+              800: '#13141c',
+              750: '#1b1d28',
+              700: '#252836',
+              600: '#34384a',
             },
-            accent: {
-              blue: '#3b82f6',
-              cyan: '#06b6d4',
+            neon: {
+              cyan: '#00f2fe',
+              blue: '#4facfe',
+              purple: '#7928ca',
+              pink: '#ff0080',
               emerald: '#10b981',
               amber: '#f59e0b',
-              rose: '#f43f5e',
             }
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           },
           boxShadow: {
-            'glow-blue': '0 0 20px -5px rgba(59, 130, 246, 0.4)',
-            'glow-emerald': '0 0 20px -5px rgba(16, 185, 129, 0.4)',
+            'glow-cyan': '0 0 25px -4px rgba(0, 242, 254, 0.45)',
+            'glow-blue': '0 0 25px -4px rgba(79, 172, 254, 0.45)',
+            'glow-purple': '0 0 25px -4px rgba(121, 40, 202, 0.45)',
+            'glow-emerald': '0 0 25px -4px rgba(16, 185, 129, 0.45)',
+            'glow-card': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+          },
+          animation: {
+            'gradient-shift': 'gradientShift 8s ease infinite',
+            'shimmer': 'shimmer 2.5s linear infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 4s ease-in-out infinite',
+          },
+          keyframes: {
+            gradientShift: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-4px)' },
+            }
           }
         }
       }
     }
   </script>
   <style>
-    /* Custom sleek scrollbar */
+    /* Custom sleek cyberpunk scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #09090b; }
-    ::-webkit-scrollbar-thumb { background: #26262c; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3f3f48; }
+    ::-webkit-scrollbar-track { background: #030305; }
+    ::-webkit-scrollbar-thumb { background: #252836; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4facfe; box-shadow: 0 0 8px rgba(79, 172, 254, 0.5); }
 
-    /* Custom range styling */
+    /* Custom range sliders with neon glowing track */
     input[type=range] {
       -webkit-appearance: none;
-      background: #26262c;
-      height: 4px;
-      border-radius: 2px;
+      background: #13141c;
+      height: 5px;
+      border-radius: 9999px;
       outline: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
-      background: #3b82f6;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
-      transition: transform 0.1s ease, background-color 0.1s ease;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.7);
+      transition: all 0.15s ease;
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
     input[type=range]::-webkit-slider-thumb:hover {
-      transform: scale(1.25);
-      background: #60a5fa;
+      transform: scale(1.3);
+      box-shadow: 0 0 18px rgba(0, 242, 254, 0.9);
     }
 
-    /* Subtle grid backdrop for monitor viewport */
+    /* Ambient animated mesh backdrop */
+    .cyber-ambient {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(79, 172, 254, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(121, 40, 202, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.04) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    /* Viewport micro grid */
     .viewport-grid {
       background-image: 
-        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
-      background-size: 24px 24px;
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
     }
 
-    /* Pulse animation */
-    @keyframes pulse-subtle {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    /* Shimmer button animation */
+    .btn-shimmer {
+      background-size: 200% 100%;
+      background-image: linear-gradient(90deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #3b82f6 75%, #1e40af 100%);
+      animation: shimmer 3s linear infinite;
     }
-    .animate-pulse-subtle {
-      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+    /* Neon border glow */
+    .neon-border {
+      border: 1px solid rgba(79, 172, 254, 0.25);
+      box-shadow: 0 0 15px -3px rgba(79, 172, 254, 0.15);
+    }
+    .neon-border:hover {
+      border-color: rgba(79, 172, 254, 0.5);
+      box-shadow: 0 0 20px -2px rgba(79, 172, 254, 0.3);
+    }
+
+    /* Animated gradient text */
+    .text-gradient {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-200 font-sans h-screen flex flex-col overflow-hidden select-none">
+<body class="bg-obsidian-950 text-zinc-100 font-sans h-screen flex flex-col overflow-hidden select-none relative">
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+  <!-- Ambient Glow Canvas -->
+  <div class="cyber-ambient"></div>
+
+  <!-- TOAST NOTIFICATIONS (Floating modern glass cards) -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2.5 pointer-events-none"></div>
 
   <!-- TOP APP HEADER / STATUS BAR -->
-  <header class="h-12 bg-zinc-900/90 backdrop-blur border-b border-zinc-800/80 px-4 flex items-center justify-between flex-shrink-0 z-20">
-    <!-- Left: Branding & Core Engine Badges -->
-    <div class="flex items-center space-x-3">
-      <div class="flex items-center space-x-2 text-zinc-100 font-mono font-semibold text-xs tracking-wider">
-        <div class="w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-glow-blue">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
+  <header class="h-14 bg-obsidian-900/80 backdrop-blur-xl border-b border-white/5 px-5 flex items-center justify-between flex-shrink-0 z-30 shadow-glow-card">
+    <!-- Left: Studio Brand & GPU/Engine telemetry -->
+    <div class="flex items-center space-x-3.5">
+      <!-- Animated Logo Badge -->
+      <div class="flex items-center space-x-3 group cursor-pointer">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 p-[1px] shadow-glow-blue transition-transform duration-300 group-hover:scale-105">
+          <div class="w-full h-full bg-obsidian-950 rounded-[11px] flex items-center justify-center">
+            <svg class="w-4 h-4 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
         </div>
-        <span class="tracking-tight font-bold" data-i18n="appTitle">VIDEO STUDIO</span>
-        <span class="text-[10px] text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded font-mono uppercase tracking-normal" data-i18n="appSubtitle">NLE Pro</span>
+        <div>
+          <div class="text-sm font-extrabold tracking-tight text-gradient flex items-center space-x-1.5">
+            <span data-i18n="appTitle">MCP VIDEO STUDIO</span>
+            <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-blue-500/10 text-cyan-400 border border-cyan-500/30">NLE 2.0</span>
+          </div>
+          <div class="text-[10px] font-mono text-zinc-500 -mt-0.5 tracking-wider" data-i18n="appSubtitle">AI Agent Media Pipeline</div>
+        </div>
       </div>
 
-      <div class="h-4 w-[1px] bg-zinc-800 hidden sm:block"></div>
+      <div class="h-5 w-[1px] bg-white/10 hidden sm:block"></div>
 
-      <!-- FFmpeg status -->
-      <div id="system-status" class="hidden sm:flex items-center space-x-1.5 text-[11px] font-mono text-zinc-400 bg-zinc-950/80 px-2 py-0.5 rounded border border-zinc-800/80">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-glow-emerald"></span>
-        <span id="ffmpeg-label">FFMPEG CONNECTED</span>
+      <!-- Live GPU Engine Badge -->
+      <div id="encoder-status" class="hidden md:flex items-center space-x-2 text-[11px] font-mono px-3 py-1 rounded-full bg-obsidian-800/90 border border-white/10 shadow-inner">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-glow-cyan"></span>
+        </span>
+        <span id="encoder-label" class="text-zinc-300 font-semibold">NVIDIA NVENC ACTIVE</span>
       </div>
 
-      <!-- Hardware Encoder status -->
-      <div id="encoder-status" class="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-zinc-400 bg-zinc-950/80 px-2 py-0.5 rounded border border-zinc-800/80">
-        <span class="w-2 h-2 rounded-full bg-blue-500 shadow-glow-blue animate-pulse-subtle"></span>
-        <span id="encoder-label">HARDWARE ACCEL</span>
+      <!-- FFmpeg Core Badge -->
+      <div id="system-status" class="hidden lg:flex items-center space-x-2 text-[11px] font-mono px-3 py-1 rounded-full bg-obsidian-800/90 border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-emerald"></span>
+        <span id="ffmpeg-label" class="text-zinc-400 font-medium">FFmpeg v9.0.2 Ready</span>
       </div>
     </div>
 
-    <!-- Right: Language Toggle, Active Clip Pill & Console Button -->
-    <div class="flex items-center space-x-3">
-      <!-- Active Clip Pill -->
-      <div id="active-file-pill" class="text-xs font-mono text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 hidden items-center space-x-1.5">
-        <span class="text-zinc-500 text-[10px]" data-i18n="clipPill">CLIP:</span> 
-        <span id="active-file-name" class="text-zinc-200 font-medium truncate max-w-[160px] md:max-w-[240px]">None</span>
+    <!-- Right: Language Segmented Switch, Active File & Console HUD -->
+    <div class="flex items-center space-x-3.5">
+      <!-- Active Clip Badge -->
+      <div id="active-file-pill" class="text-xs font-mono text-zinc-400 bg-obsidian-800/80 px-3 py-1.5 rounded-xl border border-white/10 hidden items-center space-x-2 shadow-sm">
+        <span class="text-zinc-500 text-[10px] uppercase font-bold" data-i18n="clipPill">KLİP:</span> 
+        <span id="active-file-name" class="text-cyan-300 font-semibold truncate max-w-[150px] md:max-w-[220px]">None</span>
       </div>
 
-      <!-- Language Switcher Toggle -->
-      <div class="flex items-center bg-zinc-950 p-0.5 rounded-lg border border-zinc-800 shadow-inner">
-        <button id="lang-tr" onclick="setLanguage('tr')" class="px-2 py-0.5 text-[11px] font-mono font-semibold rounded transition-all duration-150 text-zinc-400 hover:text-zinc-200">
-          TR
+      <!-- Bilingual Language Selector (TR / EN Segmented Glow) -->
+      <div class="flex items-center bg-obsidian-850 p-1 rounded-xl border border-white/10 shadow-inner">
+        <button id="lang-tr" onclick="setLanguage('tr')" 
+                class="px-2.5 py-1 text-xs font-mono font-bold rounded-lg transition-all duration-200 text-zinc-400 hover:text-white flex items-center space-x-1">
+          <span>🇹🇷</span>
+          <span>TR</span>
         </button>
-        <button id="lang-en" onclick="setLanguage('en')" class="px-2 py-0.5 text-[11px] font-mono font-semibold rounded transition-all duration-150 text-zinc-400 hover:text-zinc-200">
-          EN
+        <button id="lang-en" onclick="setLanguage('en')" 
+                class="px-2.5 py-1 text-xs font-mono font-bold rounded-lg transition-all duration-200 text-zinc-400 hover:text-white flex items-center space-x-1">
+          <span>🇬🇧</span>
+          <span>EN</span>
         </button>
       </div>
 
-      <!-- Logs / Console Toggle -->
-      <button onclick="toggleTerminal()" class="px-2.5 py-1 bg-zinc-850 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-lg text-xs font-mono text-zinc-300 hover:text-white transition-all flex items-center space-x-1.5 shadow-sm">
-        <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- Cyber Terminal Toggle Button -->
+      <button onclick="toggleTerminal()" 
+              class="px-3.5 py-1.5 bg-obsidian-800 hover:bg-obsidian-750 active:scale-95 border border-white/10 hover:border-cyan-500/40 rounded-xl text-xs font-mono text-zinc-300 hover:text-cyan-300 transition-all duration-200 flex items-center space-x-2 shadow-sm group">
+        <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-cyan-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span data-i18n="logsBtn">CONSOLE</span>
+        <span class="font-semibold" data-i18n="logsBtn">TERMINAL</span>
       </button>
     </div>
   </header>
 
-  <!-- MAIN NLE WORKSPACE -->
-  <main class="flex-1 flex overflow-hidden">
+  <!-- MAIN STUDIO WORKSPACE (3-COLUMN NLE LAYOUT) -->
+  <main class="flex-1 flex overflow-hidden relative z-10">
 
-    <!-- LEFT PANEL: MEDIA POOL & METADATA INSPECTOR -->
-    <section class="w-80 bg-zinc-900 border-r border-zinc-800/80 flex flex-col flex-shrink-0 z-10">
-      <!-- Media Pool Header & Dropzone -->
-      <div class="p-3.5 border-b border-zinc-800/80">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider font-semibold" data-i18n="mediaPool">Media Pool</span>
-          <span class="text-[10px] font-mono text-zinc-500 bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-850">4K/60 HDR</span>
+    <!-- LEFT PANEL: MEDIA VAULT & TELEMETRY INSPECTOR -->
+    <section class="w-84 bg-obsidian-900/70 backdrop-blur-md border-r border-white/5 flex flex-col flex-shrink-0">
+      
+      <!-- Media Drop Vault -->
+      <div class="p-4 border-b border-white/5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest font-bold flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span data-i18n="mediaPool">Media Pool</span>
+          </span>
+          <span class="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">RAW A/V</span>
         </div>
         
-        <!-- Modern Drag & Drop Zone -->
+        <!-- Interactive Animated Drag & Drop Zone -->
         <div id="dropzone" 
              onclick="document.getElementById('file-input').click()" 
              ondragover="handleDragOver(event)" 
              ondragleave="handleDragLeave(event)" 
              ondrop="handleDrop(event)"
-             class="relative overflow-hidden border border-dashed border-zinc-700 hover:border-blue-500/80 bg-zinc-950/70 hover:bg-zinc-950 rounded-xl p-4 text-center cursor-pointer transition-all duration-200 group">
+             class="relative overflow-hidden border border-dashed border-white/15 hover:border-cyan-400 bg-obsidian-950/80 hover:bg-obsidian-850/90 rounded-2xl p-5 text-center cursor-pointer transition-all duration-300 group neon-border">
+          
           <input type="file" id="file-input" class="hidden" accept="video/*" onchange="handleFileSelect(event)">
           
-          <div class="w-8 h-8 mx-auto mb-1.5 rounded-full bg-zinc-900 group-hover:bg-blue-600/20 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <!-- Concentric pulsing icon container -->
+          <div class="w-12 h-12 mx-auto mb-2.5 rounded-2xl bg-gradient-to-tr from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 group-hover:border-cyan-400/50 flex items-center justify-center text-cyan-400 transition-all duration-300 group-hover:scale-110 shadow-glow-cyan">
+            <svg class="w-5 h-5 group-hover:translate-y-[-2px] transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </div>
-          <div class="text-xs text-zinc-200 font-medium group-hover:text-white transition-colors" data-i18n="dropText">Drop video or browse</div>
-          <div class="text-[10px] text-zinc-500 mt-0.5" data-i18n="dropSubtext">MP4, MOV, MKV, WebM supported</div>
+          
+          <div class="text-xs font-semibold text-zinc-200 group-hover:text-cyan-300 transition-colors" data-i18n="dropText">
+            Videoyu buraya bırakın veya seçin
+          </div>
+          <div class="text-[10px] text-zinc-500 mt-1 font-mono" data-i18n="dropSubtext">
+            MP4 • MOV • MKV • WebM (10-bit HDR)
+          </div>
         </div>
 
-        <!-- Local Path Input -->
-        <div class="mt-2.5 flex space-x-1.5">
+        <!-- Local Path Input Pill -->
+        <div class="mt-3 flex space-x-1.5">
           <input type="text" id="manual-path-input" 
-                 placeholder="Or enter local file path..." 
+                 placeholder="Veya yerel dosya yolu..." 
                  data-i18n-ph="orManualPath"
-                 class="flex-1 bg-zinc-950 border border-zinc-800 px-2.5 py-1.5 rounded-lg text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-blue-500 font-mono transition-colors">
+                 class="flex-1 bg-obsidian-950 border border-white/10 px-3 py-1.5 rounded-xl text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-cyan-400 font-mono transition-colors">
           <button onclick="loadManualPath()" 
-                  class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-650 text-xs rounded-lg text-zinc-200 font-mono font-medium transition-all shadow-sm" data-i18n="loadBtn">
-            Load
+                  class="px-3.5 py-1.5 bg-obsidian-800 hover:bg-obsidian-750 text-xs rounded-xl text-cyan-300 font-mono font-bold transition-all border border-white/10 hover:border-cyan-500/40" data-i18n="loadBtn">
+            Yükle
           </button>
         </div>
       </div>
 
-      <!-- Inspector (Technical Metadata) -->
-      <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
+      <!-- Technical Telemetry Inspector -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-3.5">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider font-semibold" data-i18n="clipMetadata">Clip Metadata</span>
-          <span id="inspect-status" class="text-zinc-600 text-[10px] font-mono" data-i18n="noClipLoaded">No clip loaded</span>
+          <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest font-bold flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span data-i18n="clipMetadata">Klip Telemetrisi</span>
+          </span>
+          <span id="inspect-status" class="text-zinc-600 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5" data-i18n="noClipLoaded">Klip Bekleniyor</span>
         </div>
 
-        <div id="metadata-box" class="grid grid-cols-2 gap-1.5 text-xs font-mono">
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="res">Resolution</div>
-            <div id="meta-res" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+        <!-- Sleek Holographic Meta Cards -->
+        <div id="metadata-box" class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="res">Çözünürlük</div>
+            <div id="meta-res" class="text-cyan-300 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="fps">Framerate</div>
-            <div id="meta-fps" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="fps">Kare Hızı</div>
+            <div id="meta-fps" class="text-cyan-300 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="vcodec">Video Codec</div>
-            <div id="meta-vcodec" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="vcodec">Video Kodeği</div>
+            <div id="meta-vcodec" class="text-zinc-200 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="duration">Duration</div>
-            <div id="meta-dur" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="duration">Süre</div>
+            <div id="meta-dur" class="text-zinc-200 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="acodec">Audio Codec</div>
-            <div id="meta-acodec" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="acodec">Ses Kodeği</div>
+            <div id="meta-acodec" class="text-zinc-200 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80">
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="sampleRate">Sample Rate</div>
-            <div id="meta-samplerate" class="text-zinc-200 font-medium truncate mt-0.5">-</div>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="sampleRate">Örnekleme</div>
+            <div id="meta-samplerate" class="text-zinc-200 font-bold truncate mt-0.5">-</div>
           </div>
-          <div class="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80 col-span-2 flex justify-between items-center">
-            <span class="text-[10px] text-zinc-500 uppercase tracking-wide" data-i18n="fileSize">File Size</span>
-            <span id="meta-size" class="text-zinc-200 font-semibold font-mono">-</span>
+          <div class="p-2.5 bg-obsidian-950/80 rounded-xl border border-white/5 hover:border-white/10 transition-colors col-span-2 flex justify-between items-center">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold" data-i18n="fileSize">Dosya Boyutu</span>
+            <span id="meta-size" class="text-emerald-400 font-bold font-mono">-</span>
           </div>
         </div>
 
-        <!-- Tool Selection Tab Pills -->
-        <div class="pt-3 border-t border-zinc-800/80">
-          <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 font-semibold" data-i18n="activePipeline">Active Pipeline</div>
+        <!-- Pipeline Navigation Tabs -->
+        <div class="pt-4 border-t border-white/5">
+          <div class="text-xs font-mono text-zinc-400 uppercase tracking-widest font-bold mb-2.5" data-i18n="activePipeline">Stüdyo Modülleri</div>
           
           <div class="space-y-1.5">
+            <!-- Tab 1: Silence -->
             <button onclick="switchTool('silence')" id="btn-tab-silence" 
-                    class="w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-sm">
-              <div class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z" />
-                </svg>
-                <span data-i18n="toolSilence">Silence Removal</span>
+                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-gradient-to-r from-blue-900/40 to-cyan-900/20 text-white border border-cyan-500/40 shadow-glow-cyan">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z" />
+                  </svg>
+                </div>
+                <span class="font-bold" data-i18n="toolSilence">Sessizlik Temizleme</span>
               </div>
-              <span class="text-[10px] text-zinc-400 font-normal" data-i18n="toolSilenceSub">smart trim/atrim</span>
+              <span class="text-[10px] text-cyan-400 font-mono">dB CUT</span>
             </button>
 
+            <!-- Tab 2: Crop -->
             <button onclick="switchTool('crop')" id="btn-tab-crop" 
-                    class="w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 border border-zinc-850">
-              <div class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                <span data-i18n="toolCrop">9:16 Vertical Reframing</span>
+                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-obsidian-950/60 hover:bg-obsidian-850 text-zinc-400 hover:text-zinc-200 border border-white/5">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span class="font-bold" data-i18n="toolCrop">9:16 Dikey Kadraj</span>
               </div>
-              <span class="text-[10px] text-zinc-500 font-normal" data-i18n="toolCropSub">shorts/reels</span>
+              <span class="text-[10px] text-zinc-600 font-mono">REELS</span>
             </button>
 
+            <!-- Tab 3: LUT -->
             <button onclick="switchTool('lut')" id="btn-tab-lut" 
-                    class="w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 border border-zinc-850">
-              <div class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                </svg>
-                <span data-i18n="toolLut">3D LUT Color Grade</span>
+                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-obsidian-950/60 hover:bg-obsidian-850 text-zinc-400 hover:text-zinc-200 border border-white/5">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <span class="font-bold" data-i18n="toolLut">3D LUT Renk</span>
               </div>
-              <span class="text-[10px] text-zinc-500 font-normal" data-i18n="toolLutSub">lut3d cinematic</span>
+              <span class="text-[10px] text-zinc-600 font-mono">.CUBE</span>
             </button>
 
+            <!-- Tab 4: CapCut -->
             <button onclick="switchTool('capcut')" id="btn-tab-capcut" 
-                    class="w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 border border-zinc-850">
-              <div class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span data-i18n="toolCapcut">CapCut Draft Exporter</span>
+                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-obsidian-950/60 hover:bg-obsidian-850 text-zinc-400 hover:text-zinc-200 border border-white/5">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                </div>
+                <span class="font-bold" data-i18n="toolCapcut">CapCut Taslak</span>
               </div>
-              <span class="text-[10px] text-zinc-500 font-normal" data-i18n="toolCapcutSub">draft_content.json</span>
+              <span class="text-[10px] text-zinc-600 font-mono">DRAFT</span>
             </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CENTER PANEL: VIEWPORT & MONITOR -->
-    <section class="flex-1 bg-zinc-950 flex flex-col overflow-hidden relative">
+    <!-- CENTER PANEL: CINEMA MONITOR & LIVE AUDIO WAVEFORM -->
+    <section class="flex-1 bg-obsidian-950 flex flex-col overflow-hidden relative">
+      
       <!-- Monitor Header / A-B Stream Switcher -->
-      <div class="h-9 bg-zinc-900/90 border-b border-zinc-800/80 px-4 flex items-center justify-between text-xs">
-        <div class="flex items-center space-x-2">
-          <span class="font-mono text-zinc-400 text-[11px] font-semibold" data-i18n="viewport">VIEWPORT</span>
-          <span id="player-label" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300 border border-zinc-700/80" data-i18n="sourceStream">SOURCE</span>
+      <div class="h-10 bg-obsidian-900/60 backdrop-blur border-b border-white/5 px-5 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-3">
+          <span class="font-mono text-zinc-400 text-xs font-extrabold tracking-wider" data-i18n="viewport">VIEWPORT</span>
+          <span id="player-label" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-bold" data-i18n="sourceStream">KAYNAK</span>
         </div>
         
-        <!-- A/B Comparison Toggle Switch -->
-        <div id="ab-switch" class="flex items-center space-x-1 hidden">
+        <!-- A/B Comparison Toggle Switch (Pill slider) -->
+        <div id="ab-switch" class="flex items-center space-x-1 hidden bg-obsidian-950 p-1 rounded-xl border border-white/10">
           <button onclick="setPreviewStream('source')" id="btn-stream-source" 
-                  class="px-2.5 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium transition-colors" data-i18n="sourceStream">
-            SOURCE
+                  class="px-3 py-1 text-[10px] font-mono rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold transition-all shadow-glow-cyan" data-i18n="sourceStream">
+            KAYNAK
           </button>
           <button onclick="setPreviewStream('render')" id="btn-stream-render" 
-                  class="px-2.5 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors" data-i18n="processedStream">
-            PROCESSED
+                  class="px-3 py-1 text-[10px] font-mono rounded-lg text-zinc-400 hover:text-white transition-all font-bold" data-i18n="processedStream">
+            İŞLENMİŞ
           </button>
         </div>
       </div>
 
-      <!-- Video Display Area with Grid Canvas Backdrop -->
-      <div class="flex-1 flex items-center justify-center p-4 bg-zinc-950 viewport-grid relative overflow-hidden">
-        <video id="main-player" 
-               class="max-h-full max-w-full rounded-lg bg-black shadow-2xl border border-zinc-800/80 transition-all duration-150" 
-               controlslist="nodownload" 
-               preload="metadata" 
-               ontimeupdate="updateTimecode()"></video>
+      <!-- Main Video Screen with Viewport Grid -->
+      <div class="flex-1 flex flex-col items-center justify-center p-4 viewport-grid relative overflow-hidden">
         
-        <!-- Empty Placeholder -->
-        <div id="player-placeholder" class="text-center text-zinc-600 max-w-xs">
-          <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-600">
-            <svg class="w-8 h-8 stroke-current stroke-1" viewBox="0 0 24 24" fill="none">
-              <rect x="2" y="2" width="20" height="20" rx="4" stroke-width="2"/>
-              <polygon points="10,8 16,12 10,16" fill="currentColor"/>
-            </svg>
+        <!-- Video Container with Dynamic Ambient Shadow -->
+        <div class="relative max-h-full max-w-full flex items-center justify-center">
+          <video id="main-player" 
+                 class="max-h-[58vh] max-w-full rounded-2xl bg-black shadow-2xl border border-white/10 transition-all duration-300" 
+                 controlslist="nodownload" 
+                 preload="metadata" 
+                 ontimeupdate="updateTimecode()"></video>
+          
+          <!-- Empty Viewport State -->
+          <div id="player-placeholder" class="text-center text-zinc-600 p-8 max-w-sm">
+            <div class="w-16 h-16 mx-auto mb-3.5 rounded-2xl bg-obsidian-900 border border-white/10 flex items-center justify-center text-cyan-400/60 shadow-glow-cyan">
+              <svg class="w-8 h-8 stroke-current stroke-1 animate-float" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="4" stroke-width="2"/>
+                <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold text-zinc-300" data-i18n="noVideoLoaded">Görüntü Alanı Boş</div>
+            <div class="text-xs text-zinc-500 mt-1 font-mono" data-i18n="dropPrompt">İncelemek için sol panele bir video bırakın</div>
           </div>
-          <div class="text-xs font-mono text-zinc-400 font-medium" data-i18n="noVideoLoaded">No video loaded in viewport</div>
-          <div class="text-[11px] text-zinc-600 mt-1" data-i18n="dropPrompt">Drop a clip in the media pool to preview</div>
         </div>
 
-        <!-- Render Spinner Overlay -->
-        <div id="render-overlay" class="absolute inset-0 bg-zinc-950/85 backdrop-blur-md flex flex-col items-center justify-center space-y-3 z-30 hidden">
+        <!-- Live Audio Waveform Canvas Bar -->
+        <div class="w-full max-w-2xl mt-3 px-4 flex items-center justify-center">
+          <canvas id="waveform-canvas" width="640" height="28" class="w-full h-7 rounded-lg opacity-80"></canvas>
+        </div>
+
+        <!-- Render Spinner Overlay (Hyper-modern neon loader) -->
+        <div id="render-overlay" class="absolute inset-0 bg-obsidian-950/90 backdrop-blur-xl flex flex-col items-center justify-center space-y-4 z-40 hidden">
           <div class="relative">
-            <div class="w-10 h-10 border-2 border-blue-500/20 rounded-full"></div>
-            <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin absolute inset-0"></div>
+            <div class="w-14 h-14 border-2 border-cyan-500/20 rounded-full animate-ping"></div>
+            <div class="w-14 h-14 border-3 border-cyan-400 border-t-transparent rounded-full animate-spin absolute inset-0 shadow-glow-cyan"></div>
           </div>
-          <div class="text-xs font-mono text-zinc-200 font-medium" id="render-overlay-text">Executing FFmpeg transformation...</div>
-          <div class="text-[11px] font-mono text-blue-400 flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
-            <span id="render-encoder-sub">NVIDIA NVENC ACTIVE</span>
+          <div class="text-sm font-mono text-zinc-100 font-bold tracking-wide" id="render-overlay-text">FFmpeg İşlemi Yürütülüyor...</div>
+          <div class="flex items-center space-x-2 text-xs font-mono text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-500/30">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span id="render-encoder-sub">NVIDIA NVENC DONANIM HIZLANDIRMA AKTİF</span>
           </div>
         </div>
       </div>
 
-      <!-- Modern NLE Transport Control Bar -->
-      <div class="h-14 bg-zinc-900 border-t border-zinc-800/80 px-4 flex items-center justify-between z-10">
-        <!-- Playback Controls -->
-        <div class="flex items-center space-x-3">
+      <!-- Modern Cyber NLE Transport HUD -->
+      <div class="h-16 bg-obsidian-900/90 backdrop-blur-xl border-t border-white/5 px-6 flex items-center justify-between z-20">
+        
+        <!-- Play / Skip / Scrubber -->
+        <div class="flex items-center space-x-3.5">
           <!-- Step back 5s -->
-          <button onclick="skipSeconds(-5)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all">
+          <button onclick="skipSeconds(-5)" class="w-9 h-9 rounded-xl bg-obsidian-800 hover:bg-obsidian-750 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all border border-white/5">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
             </svg>
           </button>
 
-          <!-- Play/Pause -->
-          <button onclick="togglePlay()" class="w-9 h-9 rounded-lg bg-blue-600 hover:bg-blue-500 active:scale-95 text-white flex items-center justify-center transition-all shadow-glow-blue">
-            <svg id="play-icon" class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
+          <!-- Big Neon Play/Pause Button -->
+          <button onclick="togglePlay()" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-95 text-white flex items-center justify-center transition-all shadow-glow-cyan">
+            <svg id="play-icon" class="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
               <polygon points="5,3 19,12 5,21" />
             </svg>
-            <svg id="pause-icon" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24">
+            <svg id="pause-icon" class="w-5 h-5 fill-current hidden" viewBox="0 0 24 24">
               <rect x="6" y="4" width="4" height="16" rx="1" />
               <rect x="14" y="4" width="4" height="16" rx="1" />
             </svg>
           </button>
 
           <!-- Step forward 5s -->
-          <button onclick="skipSeconds(5)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all">
+          <button onclick="skipSeconds(5)" class="w-9 h-9 rounded-xl bg-obsidian-800 hover:bg-obsidian-750 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all border border-white/5">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
             </svg>
           </button>
           
-          <!-- Scrubber Progress -->
-          <div class="flex items-center space-x-2 pl-2">
-            <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="seekVideo(this.value)" class="w-44 sm:w-64 md:w-80 cursor-pointer">
+          <!-- Scrubber Progress Bar -->
+          <div class="flex items-center space-x-2 pl-3">
+            <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="seekVideo(this.value)" class="w-48 sm:w-72 md:w-96 cursor-pointer">
           </div>
         </div>
 
-        <!-- Center / Right: Speed Selector, Volume & Timecode -->
+        <!-- Right: Speed Selector, Timecode Display & Fullscreen -->
         <div class="flex items-center space-x-4">
-          <!-- Playback Speed -->
-          <div class="hidden sm:flex items-center space-x-1 bg-zinc-950 px-1 py-0.5 rounded-lg border border-zinc-800 text-[10px] font-mono">
-            <button onclick="setSpeed(0.5)" class="speed-btn px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition-colors" data-speed="0.5">0.5x</button>
-            <button onclick="setSpeed(1.0)" class="speed-btn px-1.5 py-0.5 rounded bg-zinc-800 text-white font-medium transition-colors" data-speed="1.0">1.0x</button>
-            <button onclick="setSpeed(1.5)" class="speed-btn px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition-colors" data-speed="1.5">1.5x</button>
-            <button onclick="setSpeed(2.0)" class="speed-btn px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition-colors" data-speed="2.0">2.0x</button>
+          <!-- Playback Speed Chips -->
+          <div class="hidden sm:flex items-center space-x-1 bg-obsidian-950 p-1 rounded-xl border border-white/10 text-[11px] font-mono">
+            <button onclick="setSpeed(0.5)" class="speed-btn px-2 py-0.5 rounded-lg text-zinc-400 hover:text-white transition-colors" data-speed="0.5">0.5x</button>
+            <button onclick="setSpeed(1.0)" class="speed-btn px-2 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 transition-colors" data-speed="1.0">1.0x</button>
+            <button onclick="setSpeed(1.5)" class="speed-btn px-2 py-0.5 rounded-lg text-zinc-400 hover:text-white transition-colors" data-speed="1.5">1.5x</button>
+            <button onclick="setSpeed(2.0)" class="speed-btn px-2 py-0.5 rounded-lg text-zinc-400 hover:text-white transition-colors" data-speed="2.0">2.0x</button>
           </div>
 
-          <!-- Timecode Display (HH:MM:SS:FF) -->
+          <!-- Studio Amber Timecode Badge (HH:MM:SS:FF) -->
           <div class="flex items-center space-x-2">
-            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider" data-i18n="timecode">TIMECODE:</span>
-            <div id="timecode-display" class="font-mono text-xs font-bold text-amber-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-zinc-800 tracking-widest shadow-inner">
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-widest font-bold" data-i18n="timecode">TIMECODE:</span>
+            <div id="timecode-display" class="font-mono text-xs font-black text-amber-400 bg-obsidian-950 px-3 py-1.5 rounded-xl border border-amber-500/30 tracking-widest shadow-inner">
               00:00:00:00
             </div>
           </div>
 
           <!-- Fullscreen button -->
-          <button onclick="toggleFullscreen()" class="w-8 h-8 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
+          <button onclick="toggleFullscreen()" class="w-9 h-9 rounded-xl bg-obsidian-800 hover:bg-obsidian-750 text-zinc-300 hover:text-white flex items-center justify-center transition-colors border border-white/5">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
             </svg>
@@ -407,135 +522,141 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: TOOL PARAMETERS -->
-    <section class="w-88 bg-zinc-900 border-l border-zinc-800/80 flex flex-col flex-shrink-0 z-10">
-      <div class="p-3.5 border-b border-zinc-800/80 flex items-center justify-between">
-        <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider font-semibold" data-i18n="activePipeline">Parameters</span>
-        <span id="active-tool-title" class="text-xs font-mono text-blue-400 font-semibold px-2 py-0.5 rounded bg-blue-950/60 border border-blue-900/60">Silence Removal</span>
+    <!-- RIGHT PANEL: TOOL FX & PIPELINE CONTROLS -->
+    <section class="w-88 bg-obsidian-900/70 backdrop-blur-md border-l border-white/5 flex flex-col flex-shrink-0">
+      <div class="p-4 border-b border-white/5 flex items-center justify-between">
+        <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest font-bold" data-i18n="activePipeline">Modül Ayarları</span>
+        <span id="active-tool-title" class="text-xs font-mono text-cyan-400 font-bold px-2.5 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-500/30 shadow-glow-cyan">Sessizlik Temizleme</span>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 space-y-4">
         
-        <!-- TOOL 1: SILENCE REMOVAL -->
+        <!-- TOOL 1: SILENCE CUTTER -->
         <div id="params-silence" class="space-y-4">
-          <div class="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-3 rounded-lg border border-zinc-800/80" data-i18n="silenceDesc">
-            Splices dead silence out of video and audio tracks with synchronized trim filters and boundary padding.
+          <div class="text-xs text-zinc-300 leading-relaxed bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5 shadow-inner" data-i18n="silenceDesc">
+            Video ve ses akışlarındaki sessiz boşlukları senkronize trim filtreleriyle kaldırır, konuşma sınırlarına koruma payı ekler.
           </div>
 
-          <div class="space-y-1.5">
+          <!-- Live Visual dB Gauge & Slider -->
+          <div class="space-y-2 bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5">
             <div class="flex justify-between text-xs font-mono">
-              <span class="text-zinc-300 font-medium" data-i18n="silenceThreshold">Silence Threshold</span>
-              <span id="label-db" class="text-blue-400 font-bold">-30 dB</span>
+              <span class="text-zinc-300 font-bold" data-i18n="silenceThreshold">Sessizlik Eşiği</span>
+              <span id="label-db" class="text-cyan-400 font-black">-30 dB</span>
             </div>
+            
+            <!-- Colorful dB Indicator Meter -->
+            <div class="h-2 w-full rounded-full bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 opacity-60"></div>
+            
             <input type="range" id="param-db" min="-50" max="-15" value="-30" step="1" 
                    oninput="document.getElementById('label-db').innerText = this.value + ' dB'" 
                    class="w-full">
             <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
-              <span data-i18n="silenceQuiet">-50 dB (Quiet room)</span>
-              <span data-i18n="silenceAggressive">-15 dB (Aggressive)</span>
+              <span data-i18n="silenceQuiet">-50 dB (Sessiz oda)</span>
+              <span data-i18n="silenceAggressive">-15 dB (Agresif)</span>
             </div>
           </div>
 
-          <div class="space-y-1.5">
+          <div class="space-y-2 bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5">
             <div class="flex justify-between text-xs font-mono">
-              <span class="text-zinc-300 font-medium" data-i18n="minGap">Min Silence Gap</span>
-              <span id="label-gap" class="text-blue-400 font-bold">0.50 s</span>
+              <span class="text-zinc-300 font-bold" data-i18n="minGap">Min Sessizlik Aralığı</span>
+              <span id="label-gap" class="text-cyan-400 font-black">0.50 s</span>
             </div>
             <input type="range" id="param-gap" min="0.1" max="2.0" value="0.5" step="0.05" 
                    oninput="document.getElementById('label-gap').innerText = parseFloat(this.value).toFixed(2) + ' s'" 
                    class="w-full">
           </div>
 
-          <div class="space-y-1.5">
+          <div class="space-y-2 bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5">
             <div class="flex justify-between text-xs font-mono">
-              <span class="text-zinc-300 font-medium" data-i18n="boundaryPadding">Voice Boundary Padding</span>
-              <span id="label-pad" class="text-blue-400 font-bold">0.10 s</span>
+              <span class="text-zinc-300 font-bold" data-i18n="boundaryPadding">Konuşma Koruma Payı</span>
+              <span id="label-pad" class="text-cyan-400 font-black">0.10 s</span>
             </div>
             <input type="range" id="param-pad" min="0.0" max="0.3" value="0.1" step="0.02" 
                    oninput="document.getElementById('label-pad').innerText = parseFloat(this.value).toFixed(2) + ' s'" 
                    class="w-full">
           </div>
 
+          <!-- Animated Shimmer Action Button -->
           <button onclick="runSilenceProcess()" 
-                  class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99] text-white rounded-lg font-mono text-xs font-bold transition-all shadow-glow-blue flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  class="w-full py-3.5 btn-shimmer active:scale-[0.98] text-white rounded-xl font-mono text-xs font-extrabold transition-all shadow-glow-blue flex items-center justify-center space-x-2 tracking-wider">
+            <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span data-i18n="runSilence">RUN SILENCE REMOVAL</span>
+            <span data-i18n="runSilence">SESSİZLİĞİ KALDIR (GPU)</span>
           </button>
         </div>
 
         <!-- TOOL 2: 9:16 VERTICAL CROP -->
         <div id="params-crop" class="space-y-4 hidden">
-          <div class="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-3 rounded-lg border border-zinc-800/80" data-i18n="cropDesc">
-            Converts horizontal 16:9 widescreen video into 9:16 vertical video for Shorts, Reels, and TikTok.
+          <div class="text-xs text-zinc-300 leading-relaxed bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5 shadow-inner" data-i18n="cropDesc">
+            16:9 yatay videoları Shorts, Reels ve TikTok için 9:16 dikey formata dönüştürür.
           </div>
 
-          <div class="space-y-2">
-            <label class="text-xs font-mono text-zinc-300 font-medium block" data-i18n="framingMethod">Framing Method</label>
-            <div class="space-y-1.5">
-              <label class="flex items-center space-x-2.5 text-xs font-mono p-2.5 bg-zinc-950 hover:bg-zinc-850 rounded-lg border border-zinc-800 cursor-pointer transition-colors">
-                <input type="radio" name="crop_mode" value="blur_pad" checked class="text-blue-500">
+          <div class="space-y-2.5">
+            <label class="text-xs font-mono text-zinc-300 font-bold block" data-i18n="framingMethod">Çerçeveleme Yöntemi</label>
+            <div class="space-y-2">
+              <label class="flex items-center space-x-3 text-xs font-mono p-3 bg-obsidian-950 hover:bg-obsidian-850 rounded-xl border border-white/5 hover:border-cyan-500/40 cursor-pointer transition-all">
+                <input type="radio" name="crop_mode" value="blur_pad" checked class="text-cyan-400">
                 <div>
-                  <div class="text-zinc-200 font-semibold" data-i18n="modeBlurPad">Blur-Pad (Ambient)</div>
-                  <div class="text-[10px] text-zinc-500" data-i18n="modeBlurPadSub">Blurred background with sharp centered video</div>
+                  <div class="text-zinc-100 font-bold" data-i18n="modeBlurPad">Bulanık Arka Plan (Ambient)</div>
+                  <div class="text-[10px] text-zinc-500 mt-0.5" data-i18n="modeBlurPadSub">Merkezde net video, arkada bulanık dolgu</div>
                 </div>
               </label>
-              <label class="flex items-center space-x-2.5 text-xs font-mono p-2.5 bg-zinc-950 hover:bg-zinc-850 rounded-lg border border-zinc-800 cursor-pointer transition-colors">
-                <input type="radio" name="crop_mode" value="center_crop" class="text-blue-500">
+              <label class="flex items-center space-x-3 text-xs font-mono p-3 bg-obsidian-950 hover:bg-obsidian-850 rounded-xl border border-white/5 hover:border-cyan-500/40 cursor-pointer transition-all">
+                <input type="radio" name="crop_mode" value="center_crop" class="text-cyan-400">
                 <div>
-                  <div class="text-zinc-200 font-semibold" data-i18n="modeCenterCrop">Center Crop (Full)</div>
-                  <div class="text-[10px] text-zinc-500" data-i18n="modeCenterCropSub">Direct 9:16 crop filling the full canvas</div>
+                  <div class="text-zinc-100 font-bold" data-i18n="modeCenterCrop">Merkez Kırpma (Full)</div>
+                  <div class="text-[10px] text-zinc-500 mt-0.5" data-i18n="modeCenterCropSub">Merkezi 9:16 oranında tam ekrana yay</div>
                 </div>
               </label>
-              <label class="flex items-center space-x-2.5 text-xs font-mono p-2.5 bg-zinc-950 hover:bg-zinc-850 rounded-lg border border-zinc-800 cursor-pointer transition-colors">
-                <input type="radio" name="crop_mode" value="fit_black_bars" class="text-blue-500">
+              <label class="flex items-center space-x-3 text-xs font-mono p-3 bg-obsidian-950 hover:bg-obsidian-850 rounded-xl border border-white/5 hover:border-cyan-500/40 cursor-pointer transition-all">
+                <input type="radio" name="crop_mode" value="fit_black_bars" class="text-cyan-400">
                 <div>
-                  <div class="text-zinc-200 font-semibold" data-i18n="modeLetterbox">Letterbox / Pillarbox</div>
-                  <div class="text-[10px] text-zinc-500" data-i18n="modeLetterboxSub">Preserve framing with black borders</div>
+                  <div class="text-zinc-100 font-bold" data-i18n="modeLetterbox">Siyah Çerçeve (Pillarbox)</div>
+                  <div class="text-[10px] text-zinc-500 mt-0.5" data-i18n="modeLetterboxSub">Oranı koruyarak siyah boşlukla hizala</div>
                 </div>
               </label>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-            <div>
-              <span class="text-zinc-500 text-[10px] uppercase font-semibold" data-i18n="width">WIDTH</span>
-              <input type="text" id="crop-w" value="1080" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 font-mono focus:outline-none focus:border-blue-500 mt-1">
+            <div class="bg-obsidian-950 p-2.5 rounded-xl border border-white/5">
+              <span class="text-zinc-500 text-[10px] uppercase font-bold" data-i18n="width">GENİŞLİK</span>
+              <input type="text" id="crop-w" value="1080" class="w-full bg-transparent text-cyan-300 font-bold focus:outline-none mt-1">
             </div>
-            <div>
-              <span class="text-zinc-500 text-[10px] uppercase font-semibold" data-i18n="height">HEIGHT</span>
-              <input type="text" id="crop-h" value="1920" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 font-mono focus:outline-none focus:border-blue-500 mt-1">
+            <div class="bg-obsidian-950 p-2.5 rounded-xl border border-white/5">
+              <span class="text-zinc-500 text-[10px] uppercase font-bold" data-i18n="height">YÜKSEKLİK</span>
+              <input type="text" id="crop-h" value="1920" class="w-full bg-transparent text-cyan-300 font-bold focus:outline-none mt-1">
             </div>
           </div>
 
           <button onclick="runCropProcess()" 
-                  class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99] text-white rounded-lg font-mono text-xs font-bold transition-all shadow-glow-blue flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  class="w-full py-3.5 btn-shimmer active:scale-[0.98] text-white rounded-xl font-mono text-xs font-extrabold transition-all shadow-glow-blue flex items-center justify-center space-x-2 tracking-wider">
+            <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span data-i18n="runCrop">REFRAME TO 9:16</span>
+            <span data-i18n="runCrop">9:16 FORMATA DÖNÜŞTÜR</span>
           </button>
         </div>
 
         <!-- TOOL 3: 3D LUT GRADE -->
         <div id="params-lut" class="space-y-4 hidden">
-          <div class="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-3 rounded-lg border border-zinc-800/80" data-i18n="lutDesc">
-            Applies cinema-standard 3D Look-Up Table (.cube/.3dl) color grading with adjustable opacity.
+          <div class="text-xs text-zinc-300 leading-relaxed bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5 shadow-inner" data-i18n="lutDesc">
+            Sinema standardı 3D LUT (.cube/.3dl) renk profillerini ayarlanabilir opaklıkla videoya işler.
           </div>
 
-          <div>
-            <label class="text-xs font-mono text-zinc-300 font-medium block mb-1.5" data-i18n="lutPathLabel">LUT File Path (.cube / .3dl)</label>
+          <div class="bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5">
+            <label class="text-xs font-mono text-zinc-300 font-bold block mb-2" data-i18n="lutPathLabel">LUT Dosya Yolu (.cube / .3dl)</label>
             <input type="text" id="lut-file-path" 
-                   placeholder="C:/path/to/cinematic.cube" 
+                   placeholder="C:/yol/cinematic.cube" 
                    data-i18n-ph="lutPlaceholder"
-                   class="w-full bg-zinc-950 border border-zinc-800 px-2.5 py-1.5 rounded-lg text-xs text-zinc-200 placeholder-zinc-600 font-mono focus:outline-none focus:border-blue-500">
+                   class="w-full bg-obsidian-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-cyan-300 font-mono placeholder-zinc-600 focus:outline-none focus:border-cyan-400">
           </div>
 
-          <div class="space-y-1.5">
+          <div class="space-y-2 bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5">
             <div class="flex justify-between text-xs font-mono">
-              <span class="text-zinc-300 font-medium" data-i18n="lutOpacity">Grading Opacity</span>
-              <span id="label-lut-intensity" class="text-blue-400 font-bold">100%</span>
+              <span class="text-zinc-300 font-bold" data-i18n="lutOpacity">Renk Derecesi Opaklığı</span>
+              <span id="label-lut-intensity" class="text-cyan-400 font-black">100%</span>
             </div>
             <input type="range" id="param-lut-intensity" min="0" max="1" value="1" step="0.05" 
                    oninput="document.getElementById('label-lut-intensity').innerText = Math.round(this.value * 100) + '%'" 
@@ -543,61 +664,63 @@
           </div>
 
           <button onclick="runLutProcess()" 
-                  class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99] text-white rounded-lg font-mono text-xs font-bold transition-all shadow-glow-blue flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  class="w-full py-3.5 btn-shimmer active:scale-[0.98] text-white rounded-xl font-mono text-xs font-extrabold transition-all shadow-glow-blue flex items-center justify-center space-x-2 tracking-wider">
+            <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
             </svg>
-            <span data-i18n="runLut">APPLY 3D LUT GRADE</span>
+            <span data-i18n="runLut">3D LUT UYGULA</span>
           </button>
         </div>
 
         <!-- TOOL 4: CAPCUT DRAFT EXPORTER -->
         <div id="params-capcut" class="space-y-4 hidden">
-          <div class="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-3 rounded-lg border border-zinc-800/80" data-i18n="capcutDesc">
-            Synthesizes native CapCut Desktop draft_content.json and meta info directly in your drafts directory.
+          <div class="text-xs text-zinc-300 leading-relaxed bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5 shadow-inner" data-i18n="capcutDesc">
+            CapCut Desktop'ın doğrudan açabildiği geçerli draft_content.json ve meta taslaklarını üretir.
           </div>
 
-          <div>
-            <label class="text-xs font-mono text-zinc-300 font-medium block mb-1.5" data-i18n="projName">Project Name</label>
-            <input type="text" id="capcut-proj-name" value="Studio_Project_01" 
-                   class="w-full bg-zinc-950 border border-zinc-800 px-2.5 py-1.5 rounded-lg text-xs text-zinc-200 font-mono focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div>
-            <label class="text-xs font-mono text-zinc-300 font-medium block mb-1.5" data-i18n="draftFolder">CapCut Drafts Folder</label>
-            <input type="text" id="capcut-draft-dir" 
-                   class="w-full bg-zinc-950 border border-zinc-800 px-2.5 py-1.5 rounded-lg text-xs text-zinc-200 font-mono focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div class="bg-obsidian-950/80 p-3.5 rounded-2xl border border-white/5 space-y-3">
             <div>
-              <span class="text-zinc-500 text-[10px] uppercase font-semibold" data-i18n="speedMultiplier">SPEED MULTIPLIER</span>
-              <input type="number" id="capcut-speed" value="1.0" step="0.1" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 mt-1">
+              <label class="text-xs font-mono text-zinc-300 font-bold block mb-1.5" data-i18n="projName">Proje Adı</label>
+              <input type="text" id="capcut-proj-name" value="Studio_Project_01" 
+                     class="w-full bg-obsidian-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-400">
             </div>
+
             <div>
-              <span class="text-zinc-500 text-[10px] uppercase font-semibold" data-i18n="fpsLabel">TARGET FPS</span>
-              <input type="number" id="capcut-fps" value="30.0" step="1" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 mt-1">
+              <label class="text-xs font-mono text-zinc-300 font-bold block mb-1.5" data-i18n="draftFolder">CapCut Taslaklar Klasörü</label>
+              <input type="text" id="capcut-draft-dir" 
+                     class="w-full bg-obsidian-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-zinc-300 font-mono focus:outline-none focus:border-cyan-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="bg-obsidian-900 p-2.5 rounded-xl border border-white/5">
+                <span class="text-zinc-500 text-[10px] uppercase font-bold" data-i18n="speedMultiplier">HIZ ÇARPANI</span>
+                <input type="number" id="capcut-speed" value="1.0" step="0.1" class="w-full bg-transparent text-cyan-300 font-bold mt-1 focus:outline-none">
+              </div>
+              <div class="bg-obsidian-900 p-2.5 rounded-xl border border-white/5">
+                <span class="text-zinc-500 text-[10px] uppercase font-bold" data-i18n="fpsLabel">HEDEF FPS</span>
+                <input type="number" id="capcut-fps" value="30.0" step="1" class="w-full bg-transparent text-cyan-300 font-bold mt-1 focus:outline-none">
+              </div>
             </div>
           </div>
 
           <button onclick="runCapCutProcess()" 
-                  class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99] text-white rounded-lg font-mono text-xs font-bold transition-all shadow-glow-blue flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  class="w-full py-3.5 btn-shimmer active:scale-[0.98] text-white rounded-xl font-mono text-xs font-extrabold transition-all shadow-glow-blue flex items-center justify-center space-x-2 tracking-wider">
+            <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
             </svg>
-            <span data-i18n="runCapcut">GENERATE CAPCUT DRAFT</span>
+            <span data-i18n="runCapcut">CAPCUT TASLAĞI OLUŞTUR</span>
           </button>
         </div>
 
-        <!-- Execution Results Card -->
-        <div id="result-box" class="p-3.5 bg-zinc-950 rounded-xl border border-emerald-500/30 text-xs font-mono space-y-2 hidden shadow-glow-emerald">
-          <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5">
+        <!-- Execution Results Glow Card -->
+        <div id="result-box" class="p-4 bg-obsidian-950/90 rounded-2xl border border-emerald-500/40 text-xs font-mono space-y-2 hidden shadow-glow-emerald">
+          <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider flex items-center space-x-2">
             <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span data-i18n="processComplete">Process Complete</span>
+            <span data-i18n="processComplete">İşlem Başarıyla Tamamlandı</span>
           </div>
-          <div id="result-details" class="text-zinc-300 text-[11px] leading-relaxed break-all bg-zinc-900/80 p-2.5 rounded-lg border border-zinc-800"></div>
+          <div id="result-details" class="text-zinc-300 text-[11px] leading-relaxed break-all bg-obsidian-900/90 p-3 rounded-xl border border-white/5"></div>
         </div>
 
       </div>
@@ -605,52 +728,53 @@
 
   </main>
 
-  <!-- BOTTOM PANEL: COLLAPSIBLE TERMINAL LOGS -->
-  <section id="terminal-panel" class="h-44 bg-zinc-950 border-t border-zinc-800/80 flex flex-col flex-shrink-0 transition-all z-20">
-    <div class="h-8 bg-zinc-900 border-b border-zinc-850 px-4 flex items-center justify-between text-[11px] font-mono text-zinc-400">
-      <div class="flex items-center space-x-2">
-        <span class="text-zinc-300 font-semibold" data-i18n="consoleTitle">FFMPEG CONSOLE</span>
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-glow-emerald"></span>
+  <!-- BOTTOM PANEL: HIGH-TECH CYBER TERMINAL -->
+  <section id="terminal-panel" class="h-44 bg-obsidian-950/95 backdrop-blur-2xl border-t border-white/10 flex flex-col flex-shrink-0 transition-all z-40">
+    <div class="h-8 bg-obsidian-900/80 border-b border-white/5 px-5 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+      <div class="flex items-center space-x-2.5">
+        <span class="text-zinc-200 font-bold" data-i18n="consoleTitle">FFMPEG KONSOLU</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-emerald"></span>
+        <span class="text-[10px] text-zinc-600 font-mono">STDOUT/STDERR</span>
       </div>
-      <div class="flex items-center space-x-3">
-        <button onclick="copyLogs()" class="hover:text-zinc-200 transition-colors flex items-center space-x-1">
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex items-center space-x-3.5">
+        <button onclick="copyLogs()" class="hover:text-cyan-300 transition-colors flex items-center space-x-1">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
-          <span data-i18n="consoleCopy">COPY</span>
+          <span data-i18n="consoleCopy">KOPYALA</span>
         </button>
-        <button onclick="clearLogs()" class="hover:text-zinc-200 transition-colors" data-i18n="consoleClear">CLEAR</button>
-        <button onclick="toggleTerminal()" class="hover:text-zinc-200 transition-colors" data-i18n="consoleClose">CLOSE</button>
+        <button onclick="clearLogs()" class="hover:text-cyan-300 transition-colors" data-i18n="consoleClear">TEMİZLE</button>
+        <button onclick="toggleTerminal()" class="hover:text-rose-400 transition-colors" data-i18n="consoleClose">KAPAT</button>
       </div>
     </div>
-    <div id="console-output" class="flex-1 p-3 font-mono text-xs text-zinc-300 overflow-y-auto space-y-1">
-      <div class="text-zinc-600" data-i18n="consoleInit">// Video Studio NLE Engine initialized. Ready for operations.</div>
+    <div id="console-output" class="flex-1 p-3.5 font-mono text-xs text-zinc-300 overflow-y-auto space-y-1.5 leading-relaxed">
+      <div class="text-zinc-600" data-i18n="consoleInit">// Video Studio NLE Motoru hazır. Donanım hızlandırma devrede.</div>
     </div>
   </section>
 
-  <!-- SCRIPT LOGIC WITH FULL I18N SUPPORT -->
+  <!-- JAVASCRIPT LOGIC & WAVEFORM ENGINE -->
   <script>
     // ==========================================
     // MULTILINGUAL DICTIONARY (TR & EN)
     // ==========================================
     const i18n = {
       tr: {
-        appTitle: "VIDEO STUDIO",
-        appSubtitle: "NLE Pro",
-        ffmpegReady: "FFMPEG BAĞLI",
-        ffmpegMissing: "FFMPEG BULUNAMADI",
+        appTitle: "MCP VIDEO STUDIO",
+        appSubtitle: "AI Agent Media Pipeline",
+        ffmpegReady: "FFmpeg v9.0.2 Hazır",
+        ffmpegMissing: "FFmpeg Bulunamadı",
         hwAccel: "DONANIM HIZLANDIRMA",
         clipPill: "KLİP:",
         noClip: "Yüklü Değil",
-        logsBtn: "KONSOL",
+        logsBtn: "TERMINAL",
         
-        mediaPool: "Medya Havuzu",
-        dropText: "Videoyu buraya sürükleyin veya göz atın",
-        dropSubtext: "MP4, MOV, MKV, WebM desteklenir",
-        orManualPath: "Veya yerel dosya yolu girin...",
+        mediaPool: "Medya Kasası",
+        dropText: "Videoyu buraya bırakın veya seçin",
+        dropSubtext: "MP4 • MOV • MKV • WebM (10-bit HDR)",
+        orManualPath: "Veya yerel dosya yolu...",
         loadBtn: "Yükle",
-        clipMetadata: "Klip Meta Verileri",
-        noClipLoaded: "Klip seçilmedi",
+        clipMetadata: "Klip Telemetrisi",
+        noClipLoaded: "Klip Bekleniyor",
         probedStatus: "ANALİZ EDİLDİ",
         res: "Çözünürlük",
         fps: "Kare Hızı",
@@ -659,22 +783,18 @@
         acodec: "Ses Kodeği",
         sampleRate: "Örnekleme",
         fileSize: "Dosya Boyutu",
-        activePipeline: "İşlem Modülleri",
+        activePipeline: "Stüdyo Modülleri",
         
         toolSilence: "Sessizlik Temizleme",
-        toolSilenceSub: "akıllı trim/atrim",
         toolCrop: "9:16 Dikey Kadraj",
-        toolCropSub: "shorts/reels",
-        toolLut: "3D LUT Renk Derecelendirme",
-        toolLutSub: "lut3d sinematik",
-        toolCapcut: "CapCut Taslak Dışa Aktar",
-        toolCapcutSub: "draft_content.json",
+        toolLut: "3D LUT Renk",
+        toolCapcut: "CapCut Taslak",
 
         viewport: "GÖRÜNTÜ ALANI",
         sourceStream: "KAYNAK",
         processedStream: "İŞLENMİŞ",
-        noVideoLoaded: "Önizleme alanında video yok",
-        dropPrompt: "İncelemek için medya havuzuna bir video aktarın",
+        noVideoLoaded: "Görüntü Alanı Boş",
+        dropPrompt: "İncelemek için sol panele bir video bırakın",
         timecode: "ZAMAN KODU:",
         speed: "Hız",
 
@@ -683,8 +803,8 @@
         silenceQuiet: "-50 dB (Sessiz oda)",
         silenceAggressive: "-15 dB (Agresif)",
         minGap: "Min Sessizlik Aralığı",
-        boundaryPadding: "Konuşma Koruma Payı (Padding)",
-        runSilence: "SESSİZLİĞİ KALDIR",
+        boundaryPadding: "Konuşma Koruma Payı",
+        runSilence: "SESSİZLİĞİ KALDIR (GPU)",
         cuttingSilence: "GPU donanım hızlandırmasıyla sessizlik temizleniyor...",
 
         cropDesc: "16:9 yatay videoları Shorts, Reels ve TikTok için 9:16 dikey formata dönüştürür.",
@@ -734,22 +854,22 @@
         probeFailed: "Dosya incelenemedi:"
       },
       en: {
-        appTitle: "VIDEO STUDIO",
-        appSubtitle: "NLE Pro",
-        ffmpegReady: "FFMPEG CONNECTED",
-        ffmpegMissing: "FFMPEG NOT FOUND",
+        appTitle: "MCP VIDEO STUDIO",
+        appSubtitle: "AI Agent Media Pipeline",
+        ffmpegReady: "FFmpeg v9.0.2 Ready",
+        ffmpegMissing: "FFmpeg Not Found",
         hwAccel: "HARDWARE ACCEL",
         clipPill: "CLIP:",
         noClip: "None",
-        logsBtn: "CONSOLE",
+        logsBtn: "TERMINAL",
         
-        mediaPool: "Media Pool",
-        dropText: "Drop video or browse",
-        dropSubtext: "MP4, MOV, MKV, WebM supported",
+        mediaPool: "Media Vault",
+        dropText: "Drop video here or browse",
+        dropSubtext: "MP4 • MOV • MKV • WebM (10-bit HDR)",
         orManualPath: "Or enter local file path...",
         loadBtn: "Load",
-        clipMetadata: "Clip Metadata",
-        noClipLoaded: "No clip loaded",
+        clipMetadata: "Clip Telemetry",
+        noClipLoaded: "Awaiting Clip",
         probedStatus: "PROBED",
         res: "Resolution",
         fps: "Framerate",
@@ -758,22 +878,18 @@
         acodec: "Audio Codec",
         sampleRate: "Sample Rate",
         fileSize: "File Size",
-        activePipeline: "Active Pipeline",
+        activePipeline: "Studio Modules",
         
         toolSilence: "Silence Removal",
-        toolSilenceSub: "smart trim/atrim",
         toolCrop: "9:16 Vertical Reframing",
-        toolCropSub: "shorts/reels",
         toolLut: "3D LUT Color Grade",
-        toolLutSub: "lut3d cinematic",
         toolCapcut: "CapCut Draft Exporter",
-        toolCapcutSub: "draft_content.json",
 
         viewport: "VIEWPORT",
         sourceStream: "SOURCE",
         processedStream: "PROCESSED",
-        noVideoLoaded: "No video loaded in viewport",
-        dropPrompt: "Drop a clip in the media pool to preview",
+        noVideoLoaded: "Viewport is Empty",
+        dropPrompt: "Drop a clip in the media vault to preview",
         timecode: "TIMECODE:",
         speed: "Speed",
 
@@ -783,7 +899,7 @@
         silenceAggressive: "-15 dB (Aggressive)",
         minGap: "Min Silence Gap",
         boundaryPadding: "Voice Boundary Padding",
-        runSilence: "RUN SILENCE REMOVAL",
+        runSilence: "RUN SILENCE REMOVAL (GPU)",
         cuttingSilence: "Cutting silence with GPU hardware acceleration...",
 
         cropDesc: "Converts horizontal 16:9 widescreen video into 9:16 vertical video for Shorts, Reels, and TikTok.",
@@ -834,27 +950,24 @@
       }
     };
 
-    // Current active language (saved in localStorage, default to 'tr')
     let currentLang = localStorage.getItem('studio_lang') || 'tr';
 
     function setLanguage(lang) {
       currentLang = lang;
       localStorage.setItem('studio_lang', lang);
 
-      // Update switcher buttons UI
       const trBtn = document.getElementById('lang-tr');
       const enBtn = document.getElementById('lang-en');
 
       if (lang === 'tr') {
-        trBtn.className = 'px-2 py-0.5 text-[11px] font-mono font-semibold rounded bg-blue-600 text-white shadow-sm';
-        enBtn.className = 'px-2 py-0.5 text-[11px] font-mono font-semibold rounded text-zinc-400 hover:text-zinc-200';
+        trBtn.className = 'px-2.5 py-1 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-glow-cyan';
+        enBtn.className = 'px-2.5 py-1 text-xs font-mono font-bold rounded-lg text-zinc-400 hover:text-white';
       } else {
-        enBtn.className = 'px-2 py-0.5 text-[11px] font-mono font-semibold rounded bg-blue-600 text-white shadow-sm';
-        trBtn.className = 'px-2 py-0.5 text-[11px] font-mono font-semibold rounded text-zinc-400 hover:text-zinc-200';
+        enBtn.className = 'px-2.5 py-1 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-glow-cyan';
+        trBtn.className = 'px-2.5 py-1 text-xs font-mono font-bold rounded-lg text-zinc-400 hover:text-white';
       }
 
-      // Translate all DOM elements with data-i18n
-      const dict = i18n[lang] || i18n.en;
+      const dict = i18n[lang] || i18n.tr;
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key]) {
@@ -862,7 +975,6 @@
         }
       });
 
-      // Translate placeholders
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
         const key = el.getAttribute('data-i18n-ph');
         if (dict[key]) {
@@ -870,53 +982,50 @@
         }
       });
 
-      // Update active tool title
       updateToolTitle(activeTool);
-      logConsole(lang === 'tr' ? 'Dil Türkçe olarak ayarlandı.' : 'Language set to English.');
+      logConsole(lang === 'tr' ? 'Arayüz dili Türkçe olarak güncellendi.' : 'Interface language updated to English.');
     }
 
     // ==========================================
-    // MODERN TOAST NOTIFICATIONS
+    // MODERN TOAST NOTIFICATIONS (Animated)
     // ==========================================
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       
-      const colors = {
-        success: 'bg-zinc-900 border-emerald-500/50 text-emerald-300 shadow-glow-emerald',
-        error: 'bg-zinc-900 border-rose-500/50 text-rose-300',
-        info: 'bg-zinc-900 border-blue-500/50 text-blue-300 shadow-glow-blue'
+      const styles = {
+        success: 'bg-obsidian-900/90 border-emerald-500/60 text-emerald-300 shadow-glow-emerald',
+        error: 'bg-obsidian-900/90 border-rose-500/60 text-rose-300',
+        info: 'bg-obsidian-900/90 border-cyan-500/60 text-cyan-300 shadow-glow-cyan'
       };
 
       const icons = {
-        success: '<svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
-        error: '<svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
-        info: '<svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+        success: '<svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>',
+        error: '<svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>',
+        info: '<svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
       };
 
-      toast.className = `pointer-events-auto flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl border text-xs font-mono backdrop-blur-md shadow-xl transition-all duration-300 transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-2xl border text-xs font-mono backdrop-blur-xl shadow-2xl transition-all duration-300 transform translate-y-3 opacity-0 ${styles[type] || styles.info}`;
       toast.innerHTML = `
         ${icons[type] || icons.info}
-        <span class="flex-1">${message}</span>
-        <button onclick="this.parentElement.remove()" class="text-zinc-500 hover:text-zinc-300 ml-2">&times;</button>
+        <span class="flex-1 font-semibold leading-tight">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-zinc-500 hover:text-white ml-2 text-base">&times;</button>
       `;
 
       container.appendChild(toast);
 
-      // Trigger animation
       requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
+        toast.classList.remove('translate-y-3', 'opacity-0');
       });
 
-      // Auto dismiss
       setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-x-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
+        toast.classList.add('opacity-0', 'translate-x-3');
+        setTimeout(() => toast.remove(), 350);
+      }, 4200);
     }
 
     // ==========================================
-    // STUDIO STATE & DOM REFERENCES
+    // STATE & DOM REFS
     // ==========================================
     let activeFilePath = null;
     let renderedFilePath = null;
@@ -926,44 +1035,87 @@
     const player = document.getElementById('main-player');
     const timecodeDisplay = document.getElementById('timecode-display');
 
-    // Init system status
+    // System probe init
     fetch('/api/system')
       .then(res => res.json())
       .then(data => {
         if (data.ffmpeg_available) {
-          document.getElementById('ffmpeg-label').innerText = data.ffmpeg_version.split(' ')[2] || 'FFMPEG READY';
+          document.getElementById('ffmpeg-label').innerText = data.ffmpeg_version.split(' ')[2] || 'FFmpeg Ready';
         } else {
           document.getElementById('ffmpeg-label').innerText = i18n[currentLang].ffmpegMissing;
-          document.getElementById('ffmpeg-label').previousElementSibling.className = 'w-2 h-2 rounded-full bg-rose-500';
         }
         if (data.encoder_name) {
           document.getElementById('encoder-label').innerText = data.encoder_name;
           document.getElementById('render-encoder-sub').innerText = data.encoder_name.toUpperCase();
         }
         document.getElementById('capcut-draft-dir').value = data.capcut_draft_dir;
-        logConsole('System initialized. Drafts path: ' + data.capcut_draft_dir);
-        logConsole('Video encoder acceleration: ' + (data.encoder_name || 'libx264'));
+        logConsole('Core engine initialized. Hardware: ' + (data.encoder_name || 'CPU libx264'));
       })
-      .catch(err => logConsole('System probe error: ' + err));
+      .catch(err => logConsole('System init error: ' + err));
 
-    // Initialize Language
     setLanguage(currentLang);
 
     // ==========================================
-    // LOGGING & CONSOLE MANAGEMENT
+    // DYNAMIC AUDIO WAVEFORM VISUALIZER (CANVAS)
+    // ==========================================
+    const canvas = document.getElementById('waveform-canvas');
+    const ctx = canvas.getContext('2d');
+    let waveOffset = 0;
+
+    function renderWaveform() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const isPlaying = player && !player.paused && !player.ended;
+      const bars = 80;
+      const barWidth = w / bars;
+
+      for (let i = 0; i < bars; i++) {
+        let barHeight = 4;
+        if (isPlaying) {
+          // Dynamic simulated frequency waves
+          const freq = Math.sin(i * 0.2 + waveOffset) * Math.cos(i * 0.1 - waveOffset * 0.5);
+          barHeight = Math.max(4, Math.abs(freq) * (h * 0.85));
+        } else if (activeFilePath) {
+          // Static resting waveform
+          const freq = Math.sin(i * 0.25) * Math.cos(i * 0.15);
+          barHeight = Math.max(3, Math.abs(freq) * (h * 0.45));
+        }
+
+        const x = i * barWidth;
+        const y = (h - barHeight) / 2;
+
+        const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
+        grad.addColorStop(0, '#00f2fe');
+        grad.addColorStop(1, '#4facfe');
+
+        ctx.fillStyle = isPlaying ? grad : '#252836';
+        ctx.beginPath();
+        ctx.roundRect(x + 1, y, Math.max(1, barWidth - 2), barHeight, 2);
+        ctx.fill();
+      }
+
+      if (isPlaying) waveOffset += 0.15;
+      requestAnimationFrame(renderWaveform);
+    }
+    renderWaveform();
+
+    // ==========================================
+    // CONSOLE MANAGEMENT
     // ==========================================
     function logConsole(msg) {
       const consoleBox = document.getElementById('console-output');
       const time = new Date().toTimeString().split(' ')[0];
       const line = document.createElement('div');
-      line.className = 'text-[11px] text-zinc-300 hover:text-white transition-colors';
-      line.innerHTML = `<span class="text-zinc-600">[${time}]</span> ${msg}`;
+      line.className = 'text-[11px] font-mono text-zinc-300 hover:text-cyan-300 transition-colors flex items-start space-x-2';
+      line.innerHTML = `<span class="text-zinc-600 font-bold">[${time}]</span> <span>${msg}</span>`;
       consoleBox.appendChild(line);
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
     function clearLogs() {
-      document.getElementById('console-output').innerHTML = '<div class="text-zinc-600">// Console cleared.</div>';
+      document.getElementById('console-output').innerHTML = '<div class="text-zinc-600">// Terminal temizlendi.</div>';
     }
 
     function copyLogs() {
@@ -974,8 +1126,7 @@
     }
 
     function toggleTerminal() {
-      const term = document.getElementById('terminal-panel');
-      term.classList.toggle('hidden');
+      document.getElementById('terminal-panel').classList.toggle('hidden');
     }
 
     // ==========================================
@@ -1000,35 +1151,33 @@
         const btn = document.getElementById(`btn-tab-${t}`);
         const pane = document.getElementById(`params-${t}`);
         if (t === tool) {
-          btn.className = 'w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-sm';
-          const icon = btn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-blue-400';
+          btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-gradient-to-r from-blue-900/40 to-cyan-900/20 text-white border border-cyan-500/40 shadow-glow-cyan';
+          btn.querySelector('div div').className = 'w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400';
           pane.classList.remove('hidden');
         } else {
-          btn.className = 'w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center justify-between bg-zinc-950 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 border border-zinc-850';
-          const icon = btn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-zinc-500';
+          btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all duration-200 flex items-center justify-between bg-obsidian-950/60 hover:bg-obsidian-850 text-zinc-400 hover:text-zinc-200 border border-white/5';
+          btn.querySelector('div div').className = 'w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400';
           pane.classList.add('hidden');
         }
       });
     }
 
     // ==========================================
-    // DRAG AND DROP & FILE SELECTION
+    // DRAG AND DROP & UPLOAD
     // ==========================================
     function handleDragOver(e) {
       e.preventDefault();
-      document.getElementById('dropzone').classList.add('border-blue-500', 'bg-zinc-900');
+      document.getElementById('dropzone').classList.add('border-cyan-400', 'bg-obsidian-850');
     }
 
     function handleDragLeave(e) {
       e.preventDefault();
-      document.getElementById('dropzone').classList.remove('border-blue-500', 'bg-zinc-900');
+      document.getElementById('dropzone').classList.remove('border-cyan-400', 'bg-obsidian-850');
     }
 
     function handleDrop(e) {
       e.preventDefault();
-      document.getElementById('dropzone').classList.remove('border-blue-500', 'bg-zinc-900');
+      document.getElementById('dropzone').classList.remove('border-cyan-400', 'bg-obsidian-850');
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         uploadFileObject(e.dataTransfer.files[0]);
       }
@@ -1043,8 +1192,8 @@
       const formData = new FormData();
       formData.append('file', file);
 
-      logConsole(`Uploading ${file.name} to workspace...`);
-      showSpinner('Uploading and probing media stream...');
+      logConsole(`Uploading file: ${file.name}`);
+      showSpinner('Yükleniyor ve FFprobe analizi yapılıyor...');
 
       fetch('/api/upload', { method: 'POST', body: formData })
         .then(res => res.json())
@@ -1053,7 +1202,7 @@
           if (data.success) {
             setLoadedClip(data.file_path, data.media_url, data.metadata);
             showToast(`${i18n[currentLang].uploadSuccess} (${file.name})`, 'success');
-            logConsole(`Uploaded successfully. Resolution: ${data.metadata.video?.width}x${data.metadata.video?.height}, FPS: ${data.metadata.video?.fps}`);
+            logConsole(`Dosya hazır. Çözünürlük: ${data.metadata.video?.width}x${data.metadata.video?.height}, FPS: ${data.metadata.video?.fps}`);
           } else {
             showToast(data.detail || 'Upload failed', 'error');
           }
@@ -1061,7 +1210,7 @@
         .catch(err => {
           hideSpinner();
           showToast(`${i18n[currentLang].uploadFailed} ${err}`, 'error');
-          logConsole('Upload failed: ' + err);
+          logConsole('Upload error: ' + err);
         });
     }
 
@@ -1069,8 +1218,8 @@
       const path = document.getElementById('manual-path-input').value.trim();
       if (!path) return;
 
-      showSpinner('Probing local file...');
-      logConsole(`Probing file on disk: ${path}`);
+      showSpinner('Dosya inceleniyor...');
+      logConsole(`Disk analizi: ${path}`);
 
       fetch('/api/probe', {
         method: 'POST',
@@ -1082,10 +1231,10 @@
         hideSpinner();
         if (data.success) {
           setLoadedClip(data.metadata.file_path, `/media/raw?path=${encodeURIComponent(data.metadata.file_path)}`, data.metadata);
-          showToast(`File loaded: ${data.metadata.file_name}`, 'success');
-          logConsole(`Loaded clip from disk: ${data.metadata.file_name}`);
+          showToast(`Klip yüklendi: ${data.metadata.file_name}`, 'success');
+          logConsole(`Yüklendi: ${data.metadata.file_name}`);
         } else {
-          showToast(data.detail || 'Could not probe file', 'error');
+          showToast(data.detail || 'İnceleme başarısız', 'error');
         }
       })
       .catch(err => {
@@ -1102,14 +1251,14 @@
       document.getElementById('active-file-pill').classList.add('flex');
       document.getElementById('active-file-name').innerText = meta.file_name;
       document.getElementById('inspect-status').innerText = i18n[currentLang].probedStatus;
-      document.getElementById('inspect-status').className = 'text-emerald-400 text-[10px] font-bold font-mono';
+      document.getElementById('inspect-status').className = 'text-cyan-400 text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20';
 
-      // Fill metadata
+      // Meta values
       document.getElementById('meta-res').innerText = meta.video ? `${meta.video.width}x${meta.video.height} (${meta.video.aspect_ratio})` : 'N/A';
-      document.getElementById('meta-fps').innerText = meta.video ? `${meta.video.fps} fps` : 'N/A';
-      document.getElementById('meta-vcodec').innerText = meta.video ? meta.video.codec : 'N/A';
+      document.getElementById('meta-fps').innerText = meta.video ? `${meta.video.fps} FPS` : 'N/A';
+      document.getElementById('meta-vcodec').innerText = meta.video ? meta.video.codec.toUpperCase() : 'N/A';
       document.getElementById('meta-dur').innerText = meta.duration_sec ? `${meta.duration_sec.toFixed(2)}s` : 'N/A';
-      document.getElementById('meta-acodec').innerText = meta.audio ? meta.audio.codec : 'N/A';
+      document.getElementById('meta-acodec').innerText = meta.audio ? meta.audio.codec.toUpperCase() : 'N/A';
       document.getElementById('meta-samplerate').innerText = meta.audio ? `${meta.audio.sample_rate} Hz` : 'N/A';
       document.getElementById('meta-size').innerText = `${meta.file_size_mb} MB`;
 
@@ -1129,7 +1278,7 @@
     }
 
     // ==========================================
-    // VIDEO TRANSPORT CONTROLS
+    // TRANSPORT BAR CONTROLS
     // ==========================================
     function togglePlay() {
       if (player.paused) {
@@ -1159,12 +1308,12 @@
       player.playbackRate = rate;
       document.querySelectorAll('.speed-btn').forEach(btn => {
         if (parseFloat(btn.getAttribute('data-speed')) === rate) {
-          btn.className = 'speed-btn px-1.5 py-0.5 rounded bg-zinc-800 text-white font-medium transition-colors';
+          btn.className = 'speed-btn px-2 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 transition-colors';
         } else {
-          btn.className = 'speed-btn px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition-colors';
+          btn.className = 'speed-btn px-2 py-0.5 rounded-lg text-zinc-400 hover:text-white transition-colors border border-transparent';
         }
       });
-      logConsole(`Playback speed set to ${rate}x`);
+      logConsole(`Oynatma hızı: ${rate}x`);
     }
 
     function toggleFullscreen() {
@@ -1193,13 +1342,13 @@
     function setPreviewStream(mode) {
       if (mode === 'source') {
         player.src = `/media/raw?path=${encodeURIComponent(activeFilePath)}`;
-        document.getElementById('btn-stream-source').className = 'px-2.5 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium transition-colors';
-        document.getElementById('btn-stream-render').className = 'px-2.5 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors';
+        document.getElementById('btn-stream-source').className = 'px-3 py-1 text-[10px] font-mono rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold transition-all shadow-glow-cyan';
+        document.getElementById('btn-stream-render').className = 'px-3 py-1 text-[10px] font-mono rounded-lg text-zinc-400 hover:text-white transition-all font-bold';
         document.getElementById('player-label').innerText = i18n[currentLang].sourceStream;
       } else {
         player.src = `/media/raw?path=${encodeURIComponent(renderedFilePath)}`;
-        document.getElementById('btn-stream-source').className = 'px-2.5 py-0.5 text-[10px] font-mono rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors';
-        document.getElementById('btn-stream-render').className = 'px-2.5 py-0.5 text-[10px] font-mono rounded bg-blue-600 text-white font-medium transition-colors';
+        document.getElementById('btn-stream-source').className = 'px-3 py-1 text-[10px] font-mono rounded-lg text-zinc-400 hover:text-white transition-all font-bold';
+        document.getElementById('btn-stream-render').className = 'px-3 py-1 text-[10px] font-mono rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold transition-all shadow-glow-cyan';
         document.getElementById('player-label').innerText = i18n[currentLang].processedStream;
       }
       player.play();
@@ -1216,7 +1365,7 @@
       const pad = parseFloat(document.getElementById('param-pad').value);
 
       showSpinner(i18n[currentLang].cuttingSilence);
-      logConsole(`Starting Silence Removal (Threshold: ${db}dB, Min Gap: ${gap}s, Padding: ${pad}s)`);
+      logConsole(`Starting Silence Removal (Eşik: ${db}dB, Aralık: ${gap}s, Koruma: ${pad}s)`);
 
       fetch('/api/process/silence', {
         method: 'POST',
@@ -1238,19 +1387,21 @@
 
           document.getElementById('result-box').classList.remove('hidden');
           document.getElementById('result-details').innerHTML = `
-            Output: <span class="text-zinc-100 font-semibold">${data.output_path}</span><br>
-            ${i18n[currentLang].cutsMade} <span class="text-emerald-400 font-bold">${data.cuts_made}</span> | ${i18n[currentLang].timeSaved} <span class="text-emerald-400 font-bold">${data.silence_removed_sec}s (${data.reduction_percentage}%)</span><br>
-            ${i18n[currentLang].durationSummary} ${data.original_duration_sec}s &rarr; ${data.new_duration_sec}s (${i18n[currentLang].elapsedTime} ${data.elapsed_sec}s)
+            <div class="space-y-1">
+              <div>Çıktı: <span class="text-cyan-300 font-bold">${data.output_path}</span></div>
+              <div>${i18n[currentLang].cutsMade} <span class="text-emerald-400 font-bold">${data.cuts_made}</span> | ${i18n[currentLang].timeSaved} <span class="text-emerald-400 font-bold">${data.silence_removed_sec}s (${data.reduction_percentage}%)</span></div>
+              <div>${i18n[currentLang].durationSummary} ${data.original_duration_sec}s &rarr; ${data.new_duration_sec}s (${i18n[currentLang].elapsedTime} <span class="text-cyan-300 font-bold">${data.elapsed_sec}s</span>)</div>
+            </div>
           `;
           showToast(`${i18n[currentLang].processComplete} (-${data.silence_removed_sec}s)`, 'success');
-          logConsole(`Silence removed. Cut ${data.cuts_made} dead segments. Duration reduced by ${data.reduction_percentage}%. Output: ${data.output_path}`);
+          logConsole(`Sessizlik temizlendi. ${data.cuts_made} aralık silindi. Süre: ${data.original_duration_sec}s -> ${data.new_duration_sec}s (Süreç: ${data.elapsed_sec}s)`);
         } else {
-          showToast(data.detail || 'Silence removal failed', 'error');
+          showToast(data.detail || 'İşlem başarısız', 'error');
         }
       })
       .catch(err => {
         hideSpinner();
-        showToast(`Silence removal error: ${err}`, 'error');
+        showToast(`Hata: ${err}`, 'error');
       });
     }
 
@@ -1262,7 +1413,7 @@
       const h = parseInt(document.getElementById('crop-h').value);
 
       showSpinner(i18n[currentLang].croppingText);
-      logConsole(`Executing 9:16 vertical crop (Mode: ${mode}, Size: ${w}x${h})`);
+      logConsole(`9:16 Dikey kadraj: ${mode} (${w}x${h})`);
 
       fetch('/api/process/crop', {
         method: 'POST',
@@ -1284,18 +1435,20 @@
 
           document.getElementById('result-box').classList.remove('hidden');
           document.getElementById('result-details').innerHTML = `
-            Output: <span class="text-zinc-100 font-semibold">${data.output_path}</span><br>
-            Mode: <span class="text-blue-400 font-semibold">${data.mode}</span> | Resolution: ${data.target_resolution} (${i18n[currentLang].elapsedTime} ${data.elapsed_sec}s)
+            <div class="space-y-1">
+              <div>Çıktı: <span class="text-cyan-300 font-bold">${data.output_path}</span></div>
+              <div>Mod: <span class="text-blue-400 font-bold">${data.mode}</span> | Çözünürlük: <span class="text-zinc-200 font-bold">${data.target_resolution}</span> (${i18n[currentLang].elapsedTime} ${data.elapsed_sec}s)</div>
+            </div>
           `;
           showToast(i18n[currentLang].processComplete, 'success');
-          logConsole(`Vertical crop completed successfully. Exported to ${data.output_path}`);
+          logConsole(`Dikey kadraj tamamlandı: ${data.output_path}`);
         } else {
-          showToast(data.detail || 'Vertical crop failed', 'error');
+          showToast(data.detail || 'Kadraj başarısız', 'error');
         }
       })
       .catch(err => {
         hideSpinner();
-        showToast(`Crop process failed: ${err}`, 'error');
+        showToast(`Hata: ${err}`, 'error');
       });
     }
 
@@ -1307,7 +1460,7 @@
       const intensity = parseFloat(document.getElementById('param-lut-intensity').value);
 
       showSpinner(i18n[currentLang].applyingLut);
-      logConsole(`Applying 3D LUT (File: ${lutPath}, Intensity: ${intensity})`);
+      logConsole(`3D LUT uygulanıyor: ${lutPath} (Opaklık: ${intensity})`);
 
       fetch('/api/process/lut', {
         method: 'POST',
@@ -1328,18 +1481,20 @@
 
           document.getElementById('result-box').classList.remove('hidden');
           document.getElementById('result-details').innerHTML = `
-            Output: <span class="text-zinc-100 font-semibold">${data.output_path}</span><br>
-            LUT: <span class="text-blue-400 font-semibold">${data.lut_path}</span> | Opacity: ${Math.round(data.intensity * 100)}%
+            <div class="space-y-1">
+              <div>Çıktı: <span class="text-cyan-300 font-bold">${data.output_path}</span></div>
+              <div>LUT: <span class="text-blue-400 font-bold">${data.lut_path}</span> | Opaklık: ${Math.round(data.intensity * 100)}%</div>
+            </div>
           `;
           showToast(i18n[currentLang].processComplete, 'success');
-          logConsole(`3D LUT grade applied. Exported to ${data.output_path}`);
+          logConsole(`3D LUT derecelendirme işlendi: ${data.output_path}`);
         } else {
-          showToast(data.detail || 'LUT process failed', 'error');
+          showToast(data.detail || 'LUT uygulanamadı', 'error');
         }
       })
       .catch(err => {
         hideSpinner();
-        showToast(`LUT process error: ${err}`, 'error');
+        showToast(`Hata: ${err}`, 'error');
       });
     }
 
@@ -1352,7 +1507,7 @@
       const fps = parseFloat(document.getElementById('capcut-fps').value) || 30.0;
 
       showSpinner(i18n[currentLang].generatingCapcut);
-      logConsole(`Generating native CapCut draft: ${projName}`);
+      logConsole(`CapCut taslağı üretiliyor: ${projName}`);
 
       fetch('/api/process/capcut', {
         method: 'POST',
@@ -1374,19 +1529,21 @@
         if (data.success) {
           document.getElementById('result-box').classList.remove('hidden');
           document.getElementById('result-details').innerHTML = `
-            Draft Project: <span class="text-zinc-100 font-bold">${data.project_name}</span><br>
-            Folder: <span class="text-zinc-300">${data.project_folder}</span><br>
-            <span class="text-blue-400 font-semibold">${data.how_to_open}</span>
+            <div class="space-y-1">
+              <div>Proje: <span class="text-cyan-300 font-bold">${data.project_name}</span></div>
+              <div>Dizin: <span class="text-zinc-400">${data.project_folder}</span></div>
+              <div class="text-emerald-400 font-bold mt-1">${data.how_to_open}</div>
+            </div>
           `;
           showToast(i18n[currentLang].processComplete, 'success');
-          logConsole(`CapCut draft synthesized at: ${data.project_folder}`);
+          logConsole(`CapCut taslağı oluşturuldu: ${data.project_folder}`);
         } else {
-          showToast(data.detail || 'CapCut export failed', 'error');
+          showToast(data.detail || 'Taslak üretilemedi', 'error');
         }
       })
       .catch(err => {
         hideSpinner();
-        showToast(`CapCut export error: ${err}`, 'error');
+        showToast(`Hata: ${err}`, 'error');
       });
     }
   </script>
