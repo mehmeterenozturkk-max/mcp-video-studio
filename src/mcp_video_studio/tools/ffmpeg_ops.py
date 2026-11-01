@@ -449,6 +449,8 @@ def remove_silence(
     cut_cmd = [
         ffmpeg_bin,
         "-y",
+        "-hwaccel",
+        "auto",
         "-i",
         str(input_p),
         "-filter_complex",
@@ -462,7 +464,7 @@ def remove_silence(
         cut_cmd.extend(["-map", "[outa]"])
 
     cut_cmd.extend(["-c:a", "aac", "-b:a", "192k", str(out_p)])
-    run_command(cut_cmd)
+    run_command(cut_cmd, timeout=max(1800, int(total_duration * 10)))
 
     new_duration = sum(end - start for start, end in speech_segments)
     silence_removed = max(0.0, total_duration - new_duration)
@@ -532,6 +534,8 @@ def smart_crop_vertical(
         cmd = [
             ffmpeg_bin,
             "-y",
+            "-hwaccel",
+            "auto",
             "-i",
             str(input_p),
             "-filter_complex",
@@ -553,6 +557,8 @@ def smart_crop_vertical(
         cmd = [
             ffmpeg_bin,
             "-y",
+            "-hwaccel",
+            "auto",
             "-i",
             str(input_p),
             "-vf",
@@ -575,6 +581,8 @@ def smart_crop_vertical(
         cmd = [
             ffmpeg_bin,
             "-y",
+            "-hwaccel",
+            "auto",
             "-i",
             str(input_p),
             "-vf",
@@ -647,6 +655,8 @@ def apply_lut_grade(
         cmd = [
             ffmpeg_bin,
             "-y",
+            "-hwaccel",
+            "auto",
             "-i",
             str(input_p),
             "-vf",
@@ -680,6 +690,8 @@ def apply_lut_grade(
         cmd = [
             ffmpeg_bin,
             "-y",
+            "-hwaccel",
+            "auto",
             "-i",
             str(input_p),
             "-filter_complex",
